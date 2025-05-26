@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Backend API service
   app:
     build:
       context: ./backend
@@ -19,6 +20,23 @@ services:
     networks:
       - economix-network
 
+  # Frontend service (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: economix-frontend
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=/api
+    depends_on:
+      - app
+    networks:
+      - economix-network
+
+  # MySQL database service
   db:
     image: mysql:8
     container_name: economix-db
@@ -36,10 +54,25 @@ services:
     networks:
       - economix-network
 
-networks:
-  economix-network:
-    driver: bridge
+  # phpMyAdmin service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: economix-phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - db
+    networks:
+      - economix-network
 
 volumes:
   mysql-data:
-    driver: local
+
+networks:
+  economix-network:
+    driver: bridge

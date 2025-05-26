@@ -1,0 +1,71 @@
+import { useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
+import { CssBaseline, ThemeProvider as MuiThemeProvider } from '@mui/material';
+import Layout from './components/layout/Layout';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Goals from './pages/Goals';
+import Challenges from './pages/Challenges';
+import Achievements from './pages/Achievements';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+};
+
+function App() {
+  const { theme } = useTheme();
+  const { isAuthenticated, loading } = useAuth();
+  const [appReady, setAppReady] = useState(false);
+  
+  useEffect(() => {
+    // La aplicación está lista cuando la autenticación ha terminado de cargar
+    if (!loading) {
+      setAppReady(true);
+    }
+  }, [loading]);
+  
+  if (!appReady) {
+    return <div>Cargando aplicación...</div>;
+  }
+  
+  return (
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <Routes>
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+        
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Dashboard />} />
+          <Route path="goals" element={<Goals />} />
+          <Route path="challenges" element={<Challenges />} />
+          <Route path="achievements" element={<Achievements />} />
+        </Route>
+        
+        <Route path="*" element={<div style={{padding: '2rem', textAlign: 'center'}}>
+          <h1>404 - Página no encontrada</h1>
+          <p>La página que buscas no existe o está en construcción.</p>
+        </div>} />
+      </Routes>
+    </MuiThemeProvider>
+  );
+}
+
+export default App;
