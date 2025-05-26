@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: economix-app
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - db
+    networks:
+      - economix-network
+
+  db:
+    image: mysql:8
+    container_name: economix-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: economix
+      MYSQL_USER: economix_user
+      MYSQL_PASSWORD: economix_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - economix-network
+
+networks:
+  economix-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
