@@ -4,8 +4,6 @@ import { useInView } from 'react-intersection-observer';
 import './css/LandingPage.css';
 import mobileImg1 from '../assets/mobile-dashboard.png';
 import mobileImg2 from '../assets/mobile-stats.png';
-import teamIcon from '../assets/team-icon.svg';
-import budgetIcon from '../assets/budget-icon.svg';
 import expenseIcon from '../assets/expense-icon.svg';
 import smartBudgetIcon from '../assets/smart-budget-icon.svg';
 import goalIcon from '../assets/goal-icon.svg';
@@ -19,6 +17,7 @@ import avatar2 from '../assets/avatar-2.svg';
 import avatar3 from '../assets/avatar-3.svg';
 import ctaMobileImg from '../assets/cta-mobile.svg';
 import { FaFacebook, FaInstagram, FaTwitter, FaGithub } from 'react-icons/fa';
+import CombinedFeaturesSocialProof from './CombinedFeaturesSocialProof';
 
 // Componente Header
 const Header = () => (
@@ -76,34 +75,6 @@ const HeroSection = () => {
     </section>
   );
 };
-
-// Componente Features Section
-const FeaturesSection = () => (
-  <section className="landing-features-section">
-    <div className="landing-feature-card">
-      <div className="landing-feature-icon">
-        <img src={budgetIcon} alt="Icono de presupuesto" />
-      </div>
-      <h3>Presupuesto Personalizado</h3>
-      <p>
-        Crea flujos de presupuestación personalizados para objetivos individuales.
-        Los usuarios pueden definir límites de gasto, categorías y acciones que conforman
-        sus planes de presupuesto.
-      </p>
-    </div>
-    <div className="landing-feature-card">
-      <div className="landing-feature-icon">
-        <img src={teamIcon} alt="Icono de equipo" />
-      </div>
-      <h3>Seguimiento de Gastos de Equipo</h3>
-      <p>
-        Gestiona finanzas en múltiples cuentas y proyectos. El seguimiento de gastos
-        de equipo permite crear subgrupos y asignar responsabilidades de presupuesto
-        de manera eficiente.
-      </p>
-    </div>
-  </section>
-);
 
 // Componente Tool Card para la sección de herramientas
 const ToolCard = ({ icon, title, description, isVisible, delay }) => (
@@ -402,8 +373,7 @@ const LandingPage = () => {
     <div className="landing-container">
       <Header />
       <HeroSection />
-      <FeaturesSection />
-      <SocialProofSection />
+      <CombinedFeaturesSocialProof />
       <ToolsSection />
       <SecuritySection />
       <TestimonialsSection />
