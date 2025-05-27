@@ -1,31 +1,11 @@
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  Container, 
-  Typography, 
-  Box, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardMedia,
-  Chip,
-  LinearProgress,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  Alert,
-  Tooltip,
-  IconButton,
-  Paper
-} from '@mui/material';
-import { 
-  CheckCircle as CheckCircleIcon,
-  Lock as LockIcon,
-  Info as InfoIcon
-} from '@mui/icons-material';
+  faCheckCircle,
+  faLock,
+  faInfoCircle
+} from '@fortawesome/free-solid-svg-icons';
+import './Achievements.css';
 import { getUserAchievements } from '../services/achievementService';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
@@ -148,264 +128,226 @@ const Achievements = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Cargando logros...
-        </Typography>
-        <LinearProgress />
-      </Container>
+      <div className="achievements-container achievements-loading">
+        <h2 className="achievements-title">Cargando logros...</h2>
+        <div className="achievements-loader"></div>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Mis Logros
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+    <div className="achievements-container">
+      <div className="achievements-header">
+        <h1 className="achievements-title">Mis Logros</h1>
+        <p className="achievements-subtitle">
           Descubre y desbloquea logros a medida que mejoras tus finanzas personales.
-        </Typography>
-      </Box>
+        </p>
+      </div>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <div className="achievements-error">
           {error}
-        </Alert>
+        </div>
       )}
       
       {/* Resumen de Logros */}
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h3" color="primary">
-                {stats.earned}
-              </Typography>
-              <Typography variant="body1">
-                Logros Desbloqueados
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h3" color="text.secondary">
-                {stats.total}
-              </Typography>
-              <Typography variant="body1">
-                Logros Totales
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h3" color="secondary">
-                {stats.completion_percentage}%
-              </Typography>
-              <Typography variant="body1">
-                Completado
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-        <Box sx={{ mt: 2 }}>
-          <LinearProgress 
-            variant="determinate" 
-            value={stats.completion_percentage} 
-            sx={{ height: 10, borderRadius: 5 }}
-          />
-        </Box>
-      </Paper>
+      <div className="achievements-summary">
+        <div className="achievements-summary-grid">
+          <div className="achievements-summary-item">
+            <div className="achievements-summary-number primary">
+              {stats.earned}
+            </div>
+            <div className="achievements-summary-text">
+              Logros Desbloqueados
+            </div>
+          </div>
+          <div className="achievements-summary-item">
+            <div className="achievements-summary-number text-secondary">
+              {stats.total}
+            </div>
+            <div className="achievements-summary-text">
+              Logros Totales
+            </div>
+          </div>
+          <div className="achievements-summary-item">
+            <div className="achievements-summary-number secondary">
+              {stats.completion_percentage}%
+            </div>
+            <div className="achievements-summary-text">
+              Completado
+            </div>
+          </div>
+        </div>
+        <div className="achievements-progress-bar">
+          <div 
+            className="achievements-progress-value" 
+            style={{ width: `${stats.completion_percentage}%` }}
+          ></div>
+        </div>
+      </div>
       
       {/* Lista de Logros */}
       {achievements.length === 0 ? (
-        <Card sx={{ minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CardContent>
-            <Typography variant="h6" color="text.secondary" align="center">
-              No hay logros disponibles en este momento.
-            </Typography>
-          </CardContent>
-        </Card>
+        <div className="achievements-empty">
+          <h3 className="achievements-empty-title">
+            No hay logros disponibles en este momento.
+          </h3>
+        </div>
       ) : (
-        <Grid container spacing={3}>
+        <div className="achievements-grid">
           {achievements.map((achievement) => {
             const progress = calculateProgress(achievement);
             const isLocked = progress === 0 && !achievement.achieved;
             
             return (
-              <Grid item xs={12} sm={6} md={4} key={achievement.id}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    opacity: isLocked ? 0.7 : 1,
-                    position: 'relative'
-                  }}
-                >
-                  {isLocked && (
-                    <Box 
-                      sx={{ 
-                        position: 'absolute', 
-                        top: 0, 
-                        left: 0, 
-                        right: 0, 
-                        bottom: 0, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                        zIndex: 1,
-                        borderRadius: 'inherit'
-                      }}
-                    >
-                      <LockIcon sx={{ fontSize: 48, color: 'white' }} />
-                    </Box>
+              <div 
+                className={`achievements-card ${isLocked ? 'locked' : ''}`}
+                key={achievement.id}
+              >
+                {isLocked && (
+                  <div className="achievements-lock-overlay">
+                    <FontAwesomeIcon icon={faLock} className="achievements-lock-icon" />
+                  </div>
+                )}
+                
+                <img
+                  className="achievements-card-image"
+                  src={achievement.badge_image || `https://via.placeholder.com/300x140?text=${encodeURIComponent(achievement.name)}`}
+                  alt={achievement.name}
+                />
+                
+                <div className="achievements-card-content">
+                  <div className="achievements-card-header">
+                    <h3 className="achievements-card-title">
+                      {achievement.name}
+                    </h3>
+                    {achievement.achieved && (
+                      <span className="achievements-tooltip" data-tooltip="Logro conseguido">
+                        <FontAwesomeIcon icon={faCheckCircle} className="achievements-check-icon" />
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="achievements-card-description">
+                    {achievement.description}
+                  </p>
+                  
+                  {!isLocked && (
+                    <>
+                      <div className="achievements-divider"></div>
+                      
+                      <div className="achievements-progress-container">
+                        <div className="achievements-progress-text">
+                          <span>Progreso:</span>
+                          <span>{progress}%</span>
+                        </div>
+                        <div className="achievements-progress-bar">
+                          <div 
+                            className={`achievements-progress-value ${achievement.achieved ? 'success' : ''}`}
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      {achievement.achieved && (
+                        <p className="achievements-date">
+                          <b>Conseguido:</b> {formatDate(achievement.achieved_at)}
+                        </p>
+                      )}
+                    </>
                   )}
                   
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={achievement.badge_image || `https://via.placeholder.com/300x140?text=${encodeURIComponent(achievement.name)}`}
-                    alt={achievement.name}
-                  />
-                  
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <Typography variant="h6" component="div">
-                        {achievement.name}
-                      </Typography>
-                      {achievement.achieved && (
-                        <Tooltip title="Logro conseguido">
-                          <CheckCircleIcon color="success" />
-                        </Tooltip>
-                      )}
-                    </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      {achievement.description}
-                    </Typography>
-                    
-                    {!isLocked && (
-                      <>
-                        <Divider sx={{ my: 1.5 }} />
-                        
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Progreso:</span>
-                            <span>{progress}%</span>
-                          </Typography>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={progress} 
-                            color={achievement.achieved ? "success" : "primary"}
-                            sx={{ height: 8, borderRadius: 4 }}
-                          />
-                        </Box>
-                        
-                        {achievement.achieved && (
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            <b>Conseguido:</b> {formatDate(achievement.achieved_at)}
-                          </Typography>
-                        )}
-                      </>
-                    )}
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                      <Tooltip title="Ver detalles">
-                        <IconButton 
-                          size="small" 
-                          onClick={() => handleOpenDialog(achievement)}
-                        >
-                          <InfoIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+                  <div className="achievements-actions">
+                    <button 
+                      className="achievements-icon-button achievements-tooltip"
+                      data-tooltip="Ver detalles"
+                      onClick={() => handleOpenDialog(achievement)}
+                    >
+                      <FontAwesomeIcon icon={faInfoCircle} />
+                    </button>
+                  </div>
+                </div>
+              </div>
             );
           })}
-        </Grid>
+        </div>
       )}
       
       {/* Diálogo de detalles del logro */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        {selectedAchievement && (
-          <>
-            <DialogTitle>
+      {openDialog && selectedAchievement && (
+        <div className="achievements-dialog-backdrop" onClick={handleCloseDialog}>
+          <div className="achievements-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="achievements-dialog-title">
               {selectedAchievement.name}
               {selectedAchievement.achieved && (
-                <Chip 
-                  label="Conseguido" 
-                  color="success" 
-                  size="small" 
-                  icon={<CheckCircleIcon />} 
-                  sx={{ ml: 1 }}
-                />
+                <span className="achievements-chip">
+                  <span className="achievements-chip-icon">
+                    <FontAwesomeIcon icon={faCheckCircle} />
+                  </span>
+                  Conseguido
+                </span>
               )}
-            </DialogTitle>
-            <DialogContent>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <img 
-                  src={selectedAchievement.badge_image || `https://via.placeholder.com/200?text=${encodeURIComponent(selectedAchievement.name)}`} 
-                  alt={selectedAchievement.name}
-                  style={{ maxWidth: '200px', maxHeight: '200px' }}
-                />
-              </Box>
+            </div>
+            <div className="achievements-dialog-content">
+              <img 
+                className="achievements-dialog-image"
+                src={selectedAchievement.badge_image || `https://via.placeholder.com/200?text=${encodeURIComponent(selectedAchievement.name)}`} 
+                alt={selectedAchievement.name}
+              />
               
-              <DialogContentText paragraph>
+              <p className="achievements-dialog-text">
                 {selectedAchievement.description}
-              </DialogContentText>
+              </p>
               
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Detalles del logro:
-                </Typography>
-                
-                {(() => {
-                  const details = getAchievementDetails(selectedAchievement);
-                  return (
-                    <>
-                      <Typography variant="body2" paragraph>
-                        <b>Requisito:</b> {details.criteria}
-                      </Typography>
-                      
-                      {!selectedAchievement.achieved && details.current !== undefined && (
-                        <Typography variant="body2" paragraph>
-                          <b>Progreso actual:</b> {details.current} / {details.target}
-                        </Typography>
-                      )}
-                      
-                      {selectedAchievement.achieved && (
-                        <Typography variant="body2" paragraph>
-                          <b>Conseguido el:</b> {formatDate(selectedAchievement.achieved_at)}
-                        </Typography>
-                      )}
-                    </>
-                  );
-                })()}
-                
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Progreso: {calculateProgress(selectedAchievement)}%
-                  </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={calculateProgress(selectedAchievement)} 
-                    color={selectedAchievement.achieved ? "success" : "primary"}
-                    sx={{ height: 10, borderRadius: 5 }}
-                  />
-                </Box>
-              </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cerrar</Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
-    </Container>
+              <h4 className="achievements-dialog-subtitle">
+                Detalles del logro:
+              </h4>
+              
+              {(() => {
+                const details = getAchievementDetails(selectedAchievement);
+                return (
+                  <>
+                    <p className="achievements-dialog-detail">
+                      <b>Requisito:</b> {details.criteria}
+                    </p>
+                    
+                    {!selectedAchievement.achieved && details.current !== undefined && (
+                      <p className="achievements-dialog-detail">
+                        <b>Progreso actual:</b> {details.current} / {details.target}
+                      </p>
+                    )}
+                    
+                    {selectedAchievement.achieved && (
+                      <p className="achievements-dialog-detail">
+                        <b>Conseguido el:</b> {formatDate(selectedAchievement.achieved_at)}
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
+              
+              <div style={{ marginTop: '16px' }}>
+                <div className="achievements-progress-text">
+                  <span>Progreso:</span>
+                  <span>{calculateProgress(selectedAchievement)}%</span>
+                </div>
+                <div className="achievements-progress-bar">
+                  <div 
+                    className={`achievements-progress-value ${selectedAchievement.achieved ? 'success' : ''}`}
+                    style={{ width: `${calculateProgress(selectedAchievement)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div className="achievements-dialog-actions">
+              <button className="achievements-dialog-button" onClick={handleCloseDialog}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

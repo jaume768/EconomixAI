@@ -1,25 +1,8 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Link,
-  Paper,
-  Avatar,
-  Alert,
-  IconButton,
-  InputAdornment
-} from '@mui/material';
-import {
-  Lock as LockIcon,
-  Visibility,
-  VisibilityOff
-} from '@mui/icons-material';
+import { useTheme } from '../context/ThemeContext';
+import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { login, error } = useAuth();
+  const { mode } = useTheme();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -49,105 +33,82 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            borderRadius: 2
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-            <LockIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+    <div className={`login-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+      <div className="login-box">
+        <div className="login-paper">
+          <div className="login-avatar">
+            <i className="fas fa-lock"></i>
+          </div>
+          <h1 className="login-title">
             Iniciar Sesión
-          </Typography>
+          </h1>
           
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            <div className="login-error">
               {error}
-            </Alert>
+            </div>
           )}
           
-          <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1, width: '100%' }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Correo Electrónico"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Contraseña"
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
+          <form className="login-form" onSubmit={handleLogin} noValidate>
+            <div className="login-form-group">
+              <label className="login-label" htmlFor="email">Correo Electrónico</label>
+              <input
+                className={`login-input ${formErrors.email ? 'error' : ''}`}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {formErrors.email && (
+                <div className="login-error-text">{formErrors.email}</div>
+              )}
+            </div>
+
+            <div className="login-form-group">
+              <label className="login-label" htmlFor="password">Contraseña</label>
+              <input
+                className={`login-input ${formErrors.password ? 'error' : ''}`}
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+              {formErrors.password && (
+                <div className="login-error-text">{formErrors.password}</div>
+              )}
+            </div>
+
+            <button
               type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              className="login-submit-button"
             >
               Iniciar Sesión
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link component={RouterLink} to="/forgot-password" variant="body2">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link component={RouterLink} to="/register" variant="body2">
-                  {"¿No tienes cuenta? Regístrate"}
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+            </button>
+            
+            <div className="login-links">
+              <Link to="/forgot-password" className="login-link">
+                ¿Olvidaste tu contraseña?
+              </Link>
+              <Link to="/register" className="login-link">
+                ¿No tienes cuenta? Regístrate
+              </Link>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
 

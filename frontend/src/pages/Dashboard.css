@@ -1,0 +1,508 @@
+/* Dashboard.css */
+.dashboard-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.dashboard-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #1976d2;
+  width: 40px;
+  height: 40px;
+  animation: dashboard-spin 1s linear infinite;
+}
+
+@keyframes dashboard-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.dashboard-error {
+  background-color: #fdeded;
+  color: #5f2120;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  border: 1px solid #ef5350;
+}
+
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Financial summary cards */
+.dashboard-summary-card {
+  display: flex;
+  flex-direction: column;
+  height: 140px;
+  padding: 16px;
+}
+
+.dashboard-summary-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-summary-value {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.dashboard-summary-footer {
+  font-size: 0.75rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-summary-icon {
+  margin-right: 8px;
+}
+
+/* Card colors */
+.dashboard-card-primary {
+  background-color: #bbdefb;
+  color: #0d47a1;
+}
+
+.dashboard-card-success {
+  background-color: #c8e6c9;
+  color: #1b5e20;
+}
+
+.dashboard-card-danger {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+.dashboard-card-warning {
+  background-color: #fff9c4;
+  color: #f57f17;
+}
+
+/* Charts */
+.dashboard-chart-container {
+  padding: 16px;
+  height: 100%;
+}
+
+.dashboard-chart-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.dashboard-chart {
+  height: 300px;
+  width: 100%;
+}
+
+.dashboard-chart-empty {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+/* Transactions */
+.dashboard-transactions {
+  padding: 16px;
+}
+
+.dashboard-transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-transactions-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.dashboard-transactions-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.dashboard-transactions-link:hover {
+  text-decoration: underline;
+}
+
+.dashboard-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+.dashboard-transaction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-transaction-item {
+  display: flex;
+  padding: 12px 0;
+  align-items: center;
+}
+
+.dashboard-transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  color: white;
+}
+
+.dashboard-transaction-income {
+  background-color: #4caf50;
+}
+
+.dashboard-transaction-expense {
+  background-color: #f44336;
+}
+
+.dashboard-transaction-content {
+  flex-grow: 1;
+}
+
+.dashboard-transaction-description {
+  margin: 0 0 4px 0;
+  font-weight: 500;
+}
+
+.dashboard-transaction-date {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+}
+
+.dashboard-transaction-amount {
+  font-weight: 700;
+}
+
+.dashboard-transaction-income-text {
+  color: #4caf50;
+}
+
+.dashboard-transaction-expense-text {
+  color: #f44336;
+}
+
+/* Goals and challenges */
+.dashboard-goals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-goals-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.dashboard-goal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-goal-item {
+  padding: 16px 0;
+}
+
+.dashboard-goal-item:not(:last-child) {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-goal-name {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-goal-icon {
+  margin-right: 8px;
+}
+
+.dashboard-goal-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dashboard-goal-dates {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.dashboard-goal-amount {
+  font-weight: 700;
+}
+
+.dashboard-progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dashboard-progress-bar {
+  height: 100%;
+  background-color: #1976d2;
+}
+
+.dashboard-challenge-item {
+  padding: 16px 0;
+}
+
+.dashboard-challenge-item:not(:last-child) {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-challenge-name {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-challenge-icon {
+  margin-right: 8px;
+  color: #f57f17;
+}
+
+/* Achievements */
+.dashboard-achievement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-achievement-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.dashboard-achievement-item:not(:last-child) {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-achievement-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  background-color: #673ab7;
+  color: white;
+}
+
+.dashboard-achievement-content {
+  flex-grow: 1;
+}
+
+.dashboard-achievement-name {
+  margin: 0 0 4px 0;
+  font-weight: 500;
+}
+
+.dashboard-achievement-date {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+}
+
+.dashboard-empty {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+}
+
+.dashboard-button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dashboard-button:hover {
+  background-color: #1565c0;
+}
+
+.dashboard-button-icon {
+  margin-right: 8px;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .dashboard-col-xs-12 {
+    grid-column: span 12;
+  }
+  
+  .dashboard-col-sm-6 {
+    grid-column: span 6;
+  }
+  
+  .dashboard-col-md-3 {
+    grid-column: span 3;
+  }
+  
+  .dashboard-col-md-5 {
+    grid-column: span 5;
+  }
+  
+  .dashboard-col-md-6 {
+    grid-column: span 6;
+  }
+  
+  .dashboard-col-md-7 {
+    grid-column: span 7;
+  }
+}
+
+@media (max-width: 960px) {
+  .dashboard-col-sm-6 {
+    grid-column: span 6;
+  }
+  
+  .dashboard-col-md-3 {
+    grid-column: span 6;
+  }
+  
+  .dashboard-col-md-5,
+  .dashboard-col-md-7 {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    gap: 16px;
+  }
+  
+  .dashboard-col-xs-12,
+  .dashboard-col-sm-6,
+  .dashboard-col-md-3,
+  .dashboard-col-md-5,
+  .dashboard-col-md-6,
+  .dashboard-col-md-7 {
+    grid-column: span 12;
+  }
+}
+
+/* Dark mode */
+.dark-mode .dashboard-card {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-mode .dashboard-card-primary {
+  background-color: #0d47a1;
+  color: #fff;
+}
+
+.dark-mode .dashboard-card-success {
+  background-color: #1b5e20;
+  color: #fff;
+}
+
+.dark-mode .dashboard-card-danger {
+  background-color: #b71c1c;
+  color: #fff;
+}
+
+.dark-mode .dashboard-card-warning {
+  background-color: #f57f17;
+  color: #fff;
+}
+
+.dark-mode .dashboard-subtitle,
+.dark-mode .dashboard-transaction-date,
+.dark-mode .dashboard-goal-dates,
+.dark-mode .dashboard-achievement-date,
+.dark-mode .dashboard-empty,
+.dark-mode .dashboard-chart-empty {
+  color: #aaa;
+}
+
+.dark-mode .dashboard-divider,
+.dark-mode .dashboard-goal-item:not(:last-child),
+.dark-mode .dashboard-challenge-item:not(:last-child),
+.dark-mode .dashboard-achievement-item:not(:last-child) {
+  border-color: #555;
+}
+
+.dark-mode .dashboard-progress-container {
+  background-color: #555;
+}
+
+.dark-mode .dashboard-error {
+  background-color: #4a1e1d;
+  color: #f8d7d7;
+  border-color: #b71c1c;
+}
+
+.dark-mode .dashboard-transactions-link {
+  color: #90caf9;
+}

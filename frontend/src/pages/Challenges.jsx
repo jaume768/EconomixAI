@@ -1,35 +1,13 @@
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  Container, 
-  Typography, 
-  Box, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardActions,
-  Button, 
-  LinearProgress,
-  Chip,
-  IconButton,
-  Tabs,
-  Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Tooltip,
-  Alert,
-  Divider,
-  Paper
-} from '@mui/material';
-import { 
-  CheckCircle as CheckCircleIcon,
-  Timer as TimerIcon,
-  Cancel as CancelIcon,
-  EmojiEvents as TrophyIcon,
-  Info as InfoIcon
-} from '@mui/icons-material';
+  faCheckCircle,
+  faClock,
+  faTimes,
+  faTrophy,
+  faInfoCircle
+} from '@fortawesome/free-solid-svg-icons';
+import './Challenges.css';
 import { getChallenges, getUserChallenges, joinChallenge, leaveChallenge } from '../services/challengeService';
 import { useAuth } from '../context/AuthContext';
 import { format, isBefore, parseISO, differenceInDays } from 'date-fns';
@@ -216,303 +194,300 @@ const Challenges = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Cargando retos...
-        </Typography>
-        <LinearProgress />
-      </Container>
+      <div className="challenges-container challenges-loading">
+        <h2 className="challenges-title">Cargando retos...</h2>
+        <div className="challenges-loader"></div>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Retos Financieros
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+    <div className="challenges-container">
+      <div className="challenges-header">
+        <h1 className="challenges-title">Retos Financieros</h1>
+        <p className="challenges-subtitle">
           Participa en retos financieros para mejorar tus hábitos y recibir recompensas.
-        </Typography>
-      </Box>
+        </p>
+      </div>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <div className="challenges-error">
           {error}
-        </Alert>
+        </div>
       )}
       
-      <Paper sx={{ mb: 4 }}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          variant="fullWidth"
-          indicatorColor="primary"
-          textColor="primary"
-        >
-          <Tab label="Mis Retos" />
-          <Tab label="Retos Disponibles" />
-        </Tabs>
-      </Paper>
+      <div className="challenges-tabs-container">
+        <div className="challenges-tabs">
+          <button 
+            className={`challenges-tab ${tabValue === 0 ? 'active' : ''}`}
+            onClick={(e) => handleTabChange(e, 0)}
+          >
+            Mis Retos
+          </button>
+          <button 
+            className={`challenges-tab ${tabValue === 1 ? 'active' : ''}`}
+            onClick={(e) => handleTabChange(e, 1)}
+          >
+            Retos Disponibles
+          </button>
+        </div>
+      </div>
       
       {/* Panel de Mis Retos */}
       {tabValue === 0 && (
         <>
           {myChallenges.length === 0 ? (
-            <Card sx={{ minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CardContent>
-                <Typography variant="h6" color="text.secondary" align="center">
-                  No estás participando en ningún reto actualmente.
-                </Typography>
-                <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 1 }}>
-                  Explora los retos disponibles y únete para mejorar tus finanzas.
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                  <Button 
-                    variant="contained" 
-                    onClick={() => setTabValue(1)}
-                  >
-                    Ver Retos Disponibles
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
+            <div className="challenges-empty">
+              <h3 className="challenges-empty-title">
+                No estás participando en ningún reto actualmente.
+              </h3>
+              <p className="challenges-empty-text">
+                Explora los retos disponibles y únete para mejorar tus finanzas.
+              </p>
+              <button 
+                className="challenges-button" 
+                onClick={() => setTabValue(1)}
+              >
+                Ver Retos Disponibles
+              </button>
+            </div>
           ) : (
-            <Grid container spacing={3}>
+            <div className="challenges-grid">
               {myChallenges.map((challenge) => {
                 const status = getChallengeStatus(challenge);
                 const progress = calculateProgress(challenge);
                 
                 return (
-                  <Grid item xs={12} md={6} lg={4} key={challenge.id}>
-                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Typography variant="h6" component="div">
-                            {challenge.name}
-                          </Typography>
-                          <Chip 
-                            label={status.label} 
-                            size="small" 
-                            color={status.color}
-                            icon={status.label === 'Completado' 
-                              ? <CheckCircleIcon /> 
-                              : status.label === 'Expirado' 
-                                ? <CancelIcon /> 
-                                : <TimerIcon />
-                            }
-                          />
-                        </Box>
-                        
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                          {challenge.description}
-                        </Typography>
-                        
-                        <Divider sx={{ my: 1.5 }} />
-                        
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          <b>Objetivo:</b> {formatCriteria(challenge.criteria)}
-                        </Typography>
-                        
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          <b>Fecha límite:</b> {format(parseISO(challenge.end_date), 'PPP', { locale: es })}
-                        </Typography>
-                        
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          <b>Tiempo restante:</b> {getRemainingDays(challenge.end_date)}
-                        </Typography>
-                        
-                        <Box sx={{ mt: 2 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            Progreso: {progress}%
-                          </Typography>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={progress} 
-                            color={status.color}
-                            sx={{ height: 10, borderRadius: 5 }}
-                          />
-                        </Box>
-                      </CardContent>
-                      <CardActions>
-                        <Button 
-                          size="small"
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => handleOpenConfirmLeave(challenge)}
+                  <div className="challenges-card" key={challenge.id}>
+                    <div className="challenges-card-content">
+                      <div className="challenges-card-header">
+                        <h3 className="challenges-card-title">
+                          {challenge.name}
+                        </h3>
+                        <span 
+                          className={`challenges-chip challenges-chip-${status.color}`}
                         >
-                          Abandonar
-                        </Button>
-                        <Box sx={{ flexGrow: 1 }} />
-                        <Tooltip title="Ver detalles">
-                          <IconButton 
-                            size="small"
-                            onClick={() => handleOpenDialog(challenge)}
-                          >
-                            <InfoIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </CardActions>
-                    </Card>
-                  </Grid>
+                          <span className="challenges-chip-icon">
+                            <FontAwesomeIcon 
+                              icon={
+                                status.label === 'Completado' 
+                                  ? faCheckCircle 
+                                  : status.label === 'Expirado' 
+                                    ? faTimes 
+                                    : faClock
+                              }
+                            />
+                          </span>
+                          {status.label}
+                        </span>
+                      </div>
+                      
+                      <p className="challenges-description">
+                        {challenge.description}
+                      </p>
+                      
+                      <div className="challenges-divider"></div>
+                      
+                      <p className="challenges-info-text">
+                        <b>Objetivo:</b> {formatCriteria(challenge.criteria)}
+                      </p>
+                      
+                      <p className="challenges-info-text">
+                        <b>Fecha límite:</b> {format(parseISO(challenge.end_date), 'PPP', { locale: es })}
+                      </p>
+                      
+                      <p className="challenges-info-text">
+                        <b>Tiempo restante:</b> {getRemainingDays(challenge.end_date)}
+                      </p>
+                      
+                      <div style={{ marginTop: '16px' }}>
+                        <div className="challenges-progress-text">
+                          <span>Progreso</span>
+                          <span>{progress}%</span>
+                        </div>
+                        <div className="challenges-progress-bar">
+                          <div 
+                            className={`challenges-progress-value challenges-progress-value-${status.color}`}
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="challenges-card-actions">
+                      <button 
+                        className="challenges-button-outlined"
+                        onClick={() => handleOpenConfirmLeave(challenge)}
+                      >
+                        Abandonar
+                      </button>
+                      <span className="challenges-spacer"></span>
+                      <button 
+                        className="challenges-icon-button challenges-tooltip"
+                        data-tooltip="Ver detalles"
+                        onClick={() => handleOpenDialog(challenge)}
+                      >
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                      </button>
+                    </div>
+                  </div>
                 );
               })}
-            </Grid>
+            </div>
           )}
         </>
       )}
-      
-      {/* Panel de Retos Disponibles */}
-      {tabValue === 1 && (
-        <>
-          {availableChallenges.length === 0 ? (
-            <Card sx={{ minHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CardContent>
-                <Typography variant="h6" color="text.secondary" align="center">
-                  No hay retos disponibles en este momento.
-                </Typography>
-                <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 1 }}>
-                  Revisa más tarde para ver nuevos retos.
-                </Typography>
-              </CardContent>
-            </Card>
-          ) : (
-            <Grid container spacing={3}>
-              {availableChallenges.map((challenge) => (
-                <Grid item xs={12} md={6} lg={4} key={challenge.id}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Typography variant="h6" component="div">
-                          {challenge.name}
-                        </Typography>
-                        <TrophyIcon color="primary" />
-                      </Box>
-                      
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        {challenge.description}
-                      </Typography>
-                      
-                      <Divider sx={{ my: 1.5 }} />
-                      
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        <b>Objetivo:</b> {formatCriteria(challenge.criteria)}
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        <b>Duración:</b> {differenceInDays(parseISO(challenge.end_date), parseISO(challenge.start_date))} días
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        <b>Fecha inicio:</b> {format(parseISO(challenge.start_date), 'PPP', { locale: es })}
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        <b>Fecha fin:</b> {format(parseISO(challenge.end_date), 'PPP', { locale: es })}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button 
-                        size="small"
-                        variant="contained"
-                        onClick={() => handleOpenDialog(challenge)}
-                        fullWidth
-                      >
-                        Unirse al Reto
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </>
-      )}
-      
-      {/* Diálogo de detalles del reto */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        {selectedChallenge && (
-          <>
-            <DialogTitle>
-              {selectedChallenge.name}
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                {selectedChallenge.description}
-              </DialogContentText>
-              
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Detalles del reto:
-                </Typography>
-                
-                <Typography variant="body2" paragraph>
-                  <b>Objetivo:</b> {formatCriteria(selectedChallenge.criteria)}
-                </Typography>
-                
-                <Typography variant="body2" paragraph>
-                  <b>Periodo:</b> Del {format(parseISO(selectedChallenge.start_date), 'PPP', { locale: es })} al {format(parseISO(selectedChallenge.end_date), 'PPP', { locale: es })}
-                </Typography>
-                
-                {/* Mostrar progreso si es un reto del usuario */}
-                {myChallenges.some(c => c.id === selectedChallenge.id) && (
-                  <>
-                    <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
-                      Tu progreso:
-                    </Typography>
-                    
-                    <Box sx={{ mt: 1 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {calculateProgress(selectedChallenge)}% completado
-                      </Typography>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={calculateProgress(selectedChallenge)} 
-                        sx={{ height: 10, borderRadius: 5 }}
-                      />
-                    </Box>
-                  </>
-                )}
-              </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cerrar</Button>
-              {/* Si no está en mis retos, mostrar botón para unirse */}
-              {!myChallenges.some(c => c.id === selectedChallenge.id) && (
-                <Button onClick={handleJoinChallenge} variant="contained" autoFocus>
-                  Unirse
-                </Button>
-              )}
-            </DialogActions>
-          </>
+    
+    {/* Panel de Retos Disponibles */}
+    {tabValue === 1 && (
+      <>
+        {availableChallenges.length === 0 ? (
+          <div className="challenges-empty">
+            <h3 className="challenges-empty-title">
+              No hay retos disponibles en este momento.
+            </h3>
+            <p className="challenges-empty-text">
+              Revisa más tarde para ver nuevos retos.
+            </p>
+          </div>
+        ) : (
+          <div className="challenges-grid">
+            {availableChallenges.map((challenge) => (
+              <div className="challenges-card" key={challenge.id}>
+                <div className="challenges-card-content">
+                  <div className="challenges-card-header">
+                    <h3 className="challenges-card-title">
+                      {challenge.name}
+                    </h3>
+                    <span className="challenges-trophy-icon">
+                      <FontAwesomeIcon icon={faTrophy} />
+                    </span>
+                  </div>
+                  
+                  <p className="challenges-description">
+                    {challenge.description}
+                  </p>
+                  
+                  <div className="challenges-divider"></div>
+                  
+                  <p className="challenges-info-text">
+                    <b>Objetivo:</b> {formatCriteria(challenge.criteria)}
+                  </p>
+                  
+                  <p className="challenges-info-text">
+                    <b>Duración:</b> {differenceInDays(parseISO(challenge.end_date), parseISO(challenge.start_date))} días
+                  </p>
+                  
+                  <p className="challenges-info-text">
+                    <b>Fecha límite:</b> {format(parseISO(challenge.end_date), 'PPP', { locale: es })}
+                  </p>
+                </div>
+                <div className="challenges-card-actions">
+                  <button 
+                    className="challenges-button"
+                    onClick={() => handleOpenDialog(challenge)}
+                  >
+                    Ver detalles
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
-      </Dialog>
-      
-      {/* Diálogo de confirmación para abandonar reto */}
-      <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-        <DialogTitle>
-          {confirmAction === 'leave' ? '¿Abandonar reto?' : '¿Completar reto?'}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {confirmAction === 'leave' ? 
-              '¿Estás seguro de que deseas abandonar este reto? Perderás todo el progreso que has logrado hasta ahora.' : 
-              '¿Estás seguro de que has completado este reto? Se verificará tu progreso.'}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenConfirmDialog(false)}>Cancelar</Button>
-          <Button 
-            onClick={handleConfirmAction} 
-            variant="contained" 
-            color={confirmAction === 'leave' ? 'error' : 'success'}
-            autoFocus
-          >
-            {confirmAction === 'leave' ? 'Abandonar' : 'Confirmar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+      </>
+    )}
+    
+    {/* Dialog para ver detalles del reto y unirse */}
+    {openDialog && (
+      <div className="challenges-dialog-backdrop" onClick={handleCloseDialog}>
+        <div className="challenges-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="challenges-dialog-title">
+            {selectedChallenge?.name}
+          </div>
+          <div className="challenges-dialog-content">
+            <p className="challenges-dialog-text">
+              {selectedChallenge?.description}
+            </p>
+            
+            <h4>Detalles del Reto</h4>
+            
+            <p className="challenges-info-text">
+              <b>Objetivo:</b> {selectedChallenge ? formatCriteria(selectedChallenge.criteria) : ''}
+            </p>
+            
+            <p className="challenges-info-text">
+              <b>Fecha de inicio:</b> {selectedChallenge ? format(parseISO(selectedChallenge.start_date), 'PPP', { locale: es }) : ''}
+            </p>
+            
+            <p className="challenges-info-text">
+              <b>Fecha límite:</b> {selectedChallenge ? format(parseISO(selectedChallenge.end_date), 'PPP', { locale: es }) : ''}
+            </p>
+            
+            <p className="challenges-info-text">
+              <b>Duración:</b> {selectedChallenge ? differenceInDays(parseISO(selectedChallenge.end_date), parseISO(selectedChallenge.start_date)) : ''} días
+            </p>
+            
+            {myChallenges.some(c => c.id === selectedChallenge?.id) && (
+              <p className="challenges-info-text">
+                <b>Progreso:</b> {selectedChallenge ? calculateProgress(selectedChallenge) : 0}%
+              </p>
+            )}
+            
+            <h4>Recompensas</h4>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '16px' }}>
+              {selectedChallenge?.rewards && Array.isArray(selectedChallenge.rewards) && 
+                selectedChallenge.rewards.map((reward, index) => (
+                  <span 
+                    key={index}
+                    className="challenges-reward-chip"
+                  >
+                    {reward.description}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+          <div className="challenges-dialog-actions">
+            <button className="challenges-cancel-button" onClick={handleCloseDialog}>
+              Cerrar
+            </button>
+            {!myChallenges.some(c => c.id === selectedChallenge?.id) && (
+              <button className="challenges-submit-button" onClick={handleJoinChallenge}>
+                Unirse al Reto
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    
+    {/* Dialog de confirmación para abandonar reto */}
+    {openConfirmDialog && (
+      <div className="challenges-dialog-backdrop" onClick={() => setOpenConfirmDialog(false)}>
+        <div className="challenges-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="challenges-dialog-title">
+            Confirmar acción
+          </div>
+          <div className="challenges-dialog-content">
+            <p className="challenges-dialog-text">
+              {confirmAction === 'leave' 
+                ? '¿Estás seguro de que quieres abandonar este reto? Perderás todo el progreso realizado.'
+                : '¿Estás seguro de que quieres realizar esta acción?'
+              }
+            </p>
+          </div>
+          <div className="challenges-dialog-actions">
+            <button className="challenges-cancel-button" onClick={() => setOpenConfirmDialog(false)}>
+              Cancelar
+            </button>
+            <button className="challenges-submit-button" onClick={handleConfirmAction}>
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
   );
 };
 

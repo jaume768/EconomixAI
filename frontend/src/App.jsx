@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
-import { CssBaseline, ThemeProvider as MuiThemeProvider } from '@mui/material';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -26,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const { theme } = useTheme();
+  const { mode } = useTheme();
   const { isAuthenticated, loading } = useAuth();
   const [appReady, setAppReady] = useState(false);
   
@@ -42,8 +41,7 @@ function App() {
   }
   
   return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
+    <div className={mode === 'dark' ? 'dark-mode' : 'light-mode'}>
       <Routes>
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
@@ -64,7 +62,7 @@ function App() {
           <p>La página que buscas no existe o está en construcción.</p>
         </div>} />
       </Routes>
-    </MuiThemeProvider>
+    </div>
   );
 }
 

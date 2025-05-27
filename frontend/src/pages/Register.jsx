@@ -1,25 +1,8 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Link,
-  Paper,
-  Avatar,
-  Alert,
-  InputAdornment,
-  IconButton
-} from '@mui/material';
-import {
-  AccountCircle as AccountIcon,
-  Visibility,
-  VisibilityOff
-} from '@mui/icons-material';
+import { useTheme } from '../context/ThemeContext';
+import './Register.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +14,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { register, error } = useAuth();
+  const { mode } = useTheme();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -83,141 +67,118 @@ const Register = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mb: 4
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            borderRadius: 2
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <AccountIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+    <div className={`register-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+      <div className="register-box">
+        <div className="register-paper">
+          <div className="register-avatar">
+            <i className="fas fa-user"></i>
+          </div>
+          <h1 className="register-title">
             Crear Cuenta
-          </Typography>
+          </h1>
           
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            <div className="register-error">
               {error}
-            </Alert>
+            </div>
           )}
           
-          <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1, width: '100%' }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="name"
-              label="Nombre Completo"
-              name="name"
-              autoComplete="name"
-              autoFocus
-              value={formData.name}
-              onChange={handleChange}
-              error={!!formErrors.name}
-              helperText={formErrors.name}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Correo Electrónico"
-              name="email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Contraseña"
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              autoComplete="new-password"
-              value={formData.password}
-              onChange={handleChange}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirmar Contraseña"
-              type={showPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              autoComplete="new-password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={!!formErrors.confirmPassword}
-              helperText={formErrors.confirmPassword}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
+          <form className="register-form" onSubmit={handleRegister} noValidate>
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="name">Nombre Completo</label>
+              <input
+                className={`register-input ${formErrors.name ? 'error' : ''}`}
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                autoFocus
+                value={formData.name}
+                onChange={handleChange}
+              />
+              {formErrors.name && (
+                <div className="register-error-text">{formErrors.name}</div>
+              )}
+            </div>
+
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="email">Correo Electrónico</label>
+              <input
+                className={`register-input ${formErrors.email ? 'error' : ''}`}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {formErrors.email && (
+                <div className="register-error-text">{formErrors.email}</div>
+              )}
+            </div>
+
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="password">Contraseña</label>
+              <input
+                className={`register-input ${formErrors.password ? 'error' : ''}`}
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="register-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+              {formErrors.password && (
+                <div className="register-error-text">{formErrors.password}</div>
+              )}
+            </div>
+
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <input
+                className={`register-input ${formErrors.confirmPassword ? 'error' : ''}`}
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="register-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+              {formErrors.confirmPassword && (
+                <div className="register-error-text">{formErrors.confirmPassword}</div>
+              )}
+            </div>
+
+            <button
               type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              className="register-submit-button"
             >
               Registrarse
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link component={RouterLink} to="/login" variant="body2">
-                  ¿Ya tienes una cuenta? Inicia sesión
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+            </button>
+            
+            <div className="register-links">
+              <Link to="/login" className="register-link">
+                ¿Ya tienes una cuenta? Inicia sesión
+              </Link>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
 
