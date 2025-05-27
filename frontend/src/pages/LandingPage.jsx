@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 import './css/LandingPage.css';
 import mobileImg1 from '../assets/mobile-dashboard.png';
 import mobileImg2 from '../assets/mobile-stats.png';
@@ -43,30 +44,38 @@ const Header = () => (
   </header>
 );
 
-// Componente Hero Section
-const HeroSection = () => (
-  <section className="landing-hero-section">
-    <div className="landing-hero-content">
-      <h1>
-        <span className="landing-highlight">Optimiza</span> tus<br />
-        gastos financieros
-      </h1>
-      <p>
-        Bienvenido a Mi Riqueza, ya sea que estés planificando tu jubilación,
-        invirtiendo en acciones o gestionando tu presupuesto, estamos aquí para
-        guiarte en cada paso.
-      </p>
-      <div className="landing-cta-buttons">
-        <Link to="/register" className="landing-try-now-button">Pruébalo Ahora</Link>
-        <a href="#learn-more" className="landing-learn-more-button">Más Información <span>→</span></a>
+// Componente Hero Section con animación al hacer scroll
+const HeroSection = () => {
+  const { ref: heroRef, inView: heroInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+    rootMargin: '-100px',
+  });
+
+  return (
+    <section className="landing-hero-section" ref={heroRef}>
+      <div className={`landing-hero-content ${heroInView ? 'animate-fade-in-left' : ''}`}>
+        <h1>
+          <span className="landing-highlight">Optimiza</span> tus<br />
+          gastos financieros
+        </h1>
+        <p>
+          Bienvenido a Mi Riqueza, ya sea que estés planificando tu jubilación,
+          invirtiendo en acciones o gestionando tu presupuesto, estamos aquí para
+          guiarte en cada paso.
+        </p>
+        <div className="landing-cta-buttons">
+          <Link to="/register" className="landing-try-now-button">Pruébalo Ahora</Link>
+          <a href="#learn-more" className="landing-learn-more-button">Más Información <span>→</span></a>
+        </div>
       </div>
-    </div>
-    <div className="landing-hero-images">
-      <img src={mobileImg1} alt="Panel móvil mostrando saldo de $789,500" className="landing-mobile-img1" />
-      <img src={mobileImg2} alt="Estadísticas móviles mostrando análisis de gastos" className="landing-mobile-img2" />
-    </div>
-  </section>
-);
+      <div className={`landing-hero-images ${heroInView ? 'animate-fade-in-right' : ''}`}>
+        <img src={mobileImg1} alt="Panel móvil mostrando saldo de $789,500" className="landing-mobile-img1" />
+        <img src={mobileImg2} alt="Estadísticas móviles mostrando análisis de gastos" className="landing-mobile-img2" />
+      </div>
+    </section>
+  );
+};
 
 // Componente Features Section
 const FeaturesSection = () => (
@@ -97,8 +106,8 @@ const FeaturesSection = () => (
 );
 
 // Componente Tool Card para la sección de herramientas
-const ToolCard = ({ icon, title, description }) => (
-  <div className="landing-tool-card">
+const ToolCard = ({ icon, title, description, isVisible, delay }) => (
+  <div className={`landing-tool-card ${isVisible ? 'animate-fade-in-up' : ''}`} style={{ transitionDelay: delay }}>
     <div className="landing-tool-icon">
       <img src={icon} alt={`${title} icon`} />
     </div>
@@ -108,35 +117,51 @@ const ToolCard = ({ icon, title, description }) => (
 );
 
 // Componente Tools Section
-const ToolsSection = () => (
-  <section className="landing-tools-section" id="tools">
-    <h2 className="landing-section-title">Herramientas <span className="landing-highlight">Esenciales</span></h2>
-    <p className="landing-section-subtitle">
-      Explora las potentes funciones y herramientas que Mi Riqueza ofrece para
-      optimizar tu gestión financiera y mejorar tu experiencia de inversión.
-    </p>
+const ToolsSection = () => {
+  const { ref: toolsRef, inView: toolsInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+    rootMargin: '-50px',
+  });
 
-    <div className="landing-tools-grid">
-      <ToolCard
-        icon={expenseIcon}
-        title="Seguimiento de Gastos"
-        description="Registra y categoriza fácilmente todos tus gastos. Obtén una visión clara de a dónde va tu dinero y gestiona tu presupuesto en tiempo real."
-      />
+  return (
+    <section className="landing-tools-section" id="tools" ref={toolsRef}>
+      <h2 className={`landing-section-title ${toolsInView ? 'animate-fade-in-down' : ''}`}>
+        Herramientas <span className="landing-highlight">Esenciales</span>
+      </h2>
+      <p className={`landing-section-subtitle ${toolsInView ? 'animate-fade-in-down' : ''}`}>
+        Explora las potentes funciones y herramientas que Mi Riqueza ofrece para
+        optimizar tu gestión financiera y mejorar tu experiencia de inversión.
+      </p>
 
-      <ToolCard
-        icon={smartBudgetIcon}
-        title="Presupuestación Inteligente"
-        description="Planifica, gestiona y personaliza presupuestos sin esfuerzo, asigna fondos, controla gastos y sigue el progreso hacia tus metas con facilidad."
-      />
+      <div className="landing-tools-grid">
+        <ToolCard
+          icon={expenseIcon}
+          title="Seguimiento de Gastos"
+          description="Registra y categoriza fácilmente todos tus gastos. Obtén una visión clara de a dónde va tu dinero y gestiona tu presupuesto en tiempo real."
+          isVisible={toolsInView}
+          delay="0s"
+        />
 
-      <ToolCard
-        icon={goalIcon}
-        title="Ahorro Orientado a Objetivos"
-        description="Establece objetivos de ahorro significativos, sigue el progreso en tiempo real y utiliza recomendaciones personalizadas para hacer realidad tus metas."
-      />
-    </div>
-  </section>
-);
+        <ToolCard
+          icon={smartBudgetIcon}
+          title="Presupuestación Inteligente"
+          description="Planifica, gestiona y personaliza presupuestos sin esfuerzo, asigna fondos, controla gastos y sigue el progreso hacia tus metas con facilidad."
+          isVisible={toolsInView}
+          delay="0.2s"
+        />
+
+        <ToolCard
+          icon={goalIcon}
+          title="Ahorro Orientado a Objetivos"
+          description="Establece objetivos de ahorro significativos, sigue el progreso en tiempo real y utiliza recomendaciones personalizadas para hacer realidad tus metas."
+          isVisible={toolsInView}
+          delay="0.4s"
+        />
+      </div>
+    </section>
+  );
+};
 
 // Componente Social Proof Section
 const SocialProofSection = () => (
@@ -153,67 +178,76 @@ const SocialProofSection = () => (
   </section>
 );
 
-// Componente de Seguridad
-const SecuritySection = () => (
-  <section className="landing-security-section" id="security">
-    <h2 className="landing-section-title">Tu <span className="landing-highlight">seguridad</span> es nuestra prioridad</h2>
-    <p className="landing-section-subtitle">
-      Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
-      cada etapa de tu viaje financiero.
-    </p>
+// Componente de Seguridad con animaciones
+const SecuritySection = () => {
+  const { ref: securityRef, inView: securityInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
 
-    <div className="landing-security-container">
-      <div className="landing-security-cards landing-security-left">
-        <div className="landing-security-card">
-          <div className="landing-security-icon">
-            <img src={privacyIcon} alt="Icono de privacidad de datos" />
+  return (
+    <section className="landing-security-section" id="security" ref={securityRef}>
+      <h2 className={`landing-section-title ${securityInView ? 'animate-fade-in-down' : ''}`}>
+        Tu <span className="landing-highlight">seguridad</span> es nuestra prioridad
+      </h2>
+      <p className={`landing-section-subtitle ${securityInView ? 'animate-fade-in-down' : ''}`}>
+        Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
+        cada etapa de tu viaje financiero.
+      </p>
+
+      <div className="landing-security-container">
+        <div className="landing-security-cards landing-security-left">
+          <div className={`landing-security-card ${securityInView ? 'animate-slide-in-left' : ''}`} style={{ transitionDelay: '0.1s' }}>
+            <div className="landing-security-icon">
+              <img src={privacyIcon} alt="Icono de privacidad de datos" />
+            </div>
+            <h3>Cumplimiento de Privacidad de Datos</h3>
+            <p>Cumplimos totalmente con leyes de protección de datos como RGPD y CCPA.</p>
           </div>
-          <h3>Cumplimiento de Privacidad de Datos</h3>
-          <p>Cumplimos totalmente con leyes de protección de datos como RGPD y CCPA.</p>
+
+          <div className={`landing-security-card ${securityInView ? 'animate-slide-in-left' : ''}`} style={{ transitionDelay: '0.3s' }}>
+            <div className="landing-security-icon">
+              <img src={authIcon} alt="Icono de autenticación" />
+            </div>
+            <h3>Autenticación Segura</h3>
+            <p>La autenticación de dos factores (2FA) y opciones de inicio de sesión biométrico añaden una capa extra de seguridad.</p>
+          </div>
         </div>
 
-        <div className="landing-security-card">
-          <div className="landing-security-icon">
-            <img src={authIcon} alt="Icono de autenticación" />
+        <div className={`landing-security-mobile ${securityInView ? 'animate-fade-in-up' : ''}`} style={{ transitionDelay: '0.2s' }}>
+          <img src={securityMobileImg} alt="Verificación de seguridad en móvil" />
+        </div>
+
+        <div className="landing-security-cards landing-security-right">
+          <div className={`landing-security-card ${securityInView ? 'animate-slide-in-right' : ''}`} style={{ transitionDelay: '0.1s' }}>
+            <div className="landing-security-icon">
+              <img src={encryptionIcon} alt="Icono de encriptación" />
+            </div>
+            <h3>Encriptación de Nivel Bancario</h3>
+            <p>Toda la información sensible está protegida con estándares avanzados de encriptación (AES-256).</p>
           </div>
-          <h3>Autenticación Segura</h3>
-          <p>La autenticación de dos factores (2FA) y opciones de inicio de sesión biométrico añaden una capa extra de seguridad.</p>
+
+          <div className={`landing-security-card ${securityInView ? 'animate-slide-in-right' : ''}`} style={{ transitionDelay: '0.3s' }}>
+            <div className="landing-security-icon">
+              <img src={monitoringIcon} alt="Icono de monitorización" />
+            </div>
+            <h3>Monitorización 24/7</h3>
+            <p>Nuestro equipo de seguridad monitorea el sistema las 24 horas del día para detectar y prevenir cualquier actividad sospechosa.</p>
+          </div>
         </div>
       </div>
+    </section>
+  );
+};
 
-      <div className="landing-security-mobile">
-        <img src={securityMobileImg} alt="Verificación de seguridad en móvil" />
-      </div>
-
-      <div className="landing-security-cards landing-security-right">
-        <div className="landing-security-card">
-          <div className="landing-security-icon">
-            <img src={encryptionIcon} alt="Icono de encriptación" />
-          </div>
-          <h3>Encriptación de Nivel Bancario</h3>
-          <p>Toda la información sensible está protegida con estándares avanzados de encriptación (AES-256).</p>
-        </div>
-
-        <div className="landing-security-card">
-          <div className="landing-security-icon">
-            <img src={monitoringIcon} alt="Icono de monitorización" />
-          </div>
-          <h3>Monitorización 24/7</h3>
-          <p>Nuestro equipo de seguridad monitorea el sistema las 24 horas del día para detectar y prevenir cualquier actividad sospechosa.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-// Componente de Tarjeta de Testimonio
-const TestimonialCard = ({ rating, title, quote, name, position, avatar }) => (
-  <div className="landing-testimonial-card">
+// Componente de Tarjeta de Testimonio con animación
+const TestimonialCard = ({ rating, title, quote, name, position, avatar, isVisible, delay }) => (
+  <div className={`landing-testimonial-card ${isVisible ? 'animate-scale-in' : ''}`} style={{ transitionDelay: delay }}>
     <div className="landing-testimonial-rating">
       {[...Array(5)].map((_, i) => (
         <span key={i} className={i < rating ? "landing-star-filled" : "landing-star-empty"}>★</span>
       ))}
-      <span className="landing-rating-number">{rating}.0</span>
+      <span className="landing-rating-number">{rating}</span>
     </div>
     <h3 className="landing-testimonial-title">"{title}"</h3>
     <p className="landing-testimonial-quote">"{quote}"</p>
@@ -227,64 +261,87 @@ const TestimonialCard = ({ rating, title, quote, name, position, avatar }) => (
   </div>
 );
 
-// Componente de Testimonios
-const TestimonialsSection = () => (
-  <section className="landing-testimonials-section" id="testimonials">
-    <h2 className="landing-section-title">Lo que nuestros <span className="landing-highlight">usuarios</span> dicen</h2>
-    <p className="landing-section-subtitle">
-      Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
-      cada etapa de tu viaje financiero.
-    </p>
+// Componente de Testimonios con animación
+const TestimonialsSection = () => {
+  const { ref: testimonialsRef, inView: testimonialsInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+    rootMargin: '-50px',
+  });
 
-    <div className="landing-testimonials-grid">
-      <TestimonialCard
-        rating={4}
-        title="Facilidad de uso"
-        quote="Me encanta la sencillez de esta aplicación. El seguimiento de gastos y los recordatorios me han hecho más constante con mi planificación financiera. ¡Muy recomendable!"
-        name="Sarah W."
-        position="Autónoma"
-        avatar={avatar1}
-      />
+  return (
+    <section className="landing-testimonials-section" id="testimonials" ref={testimonialsRef}>
+      <h2 className={`landing-section-title ${testimonialsInView ? 'animate-fade-in-down' : ''}`}>
+        Lo que nuestros <span className="landing-highlight">usuarios</span> dicen
+      </h2>
+      <p className={`landing-section-subtitle ${testimonialsInView ? 'animate-fade-in-down' : ''}`}>
+        Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
+        cada etapa de tu viaje financiero.
+      </p>
 
-      <TestimonialCard
-        rating={4.5}
-        title="Control de gastos"
-        quote="Los conocimientos y desgloses visuales realmente me ayudan a entender mis hábitos de gasto. Ahora tengo un control total, lo que me permite mejorar mis finanzas."
-        name="Mark T."
-        position="Profesor"
-        avatar={avatar2}
-      />
+      <div className="landing-testimonials-grid">
+        <TestimonialCard
+          rating={4}
+          title="Facilidad de uso"
+          quote="Me encanta la sencillez de esta aplicación. El seguimiento de gastos y los recordatorios me han hecho más constante con mi planificación financiera. ¡Muy recomendable!"
+          name="Sarah W."
+          position="Autónoma"
+          avatar={avatar1}
+          isVisible={testimonialsInView}
+          delay="0s"
+        />
 
-      <TestimonialCard
-        rating={4.9}
-        title="Gestión"
-        quote="¡Esta aplicación ha transformado completamente la forma en que gestiono mi dinero! Finalmente puedo ahorrar cada mes y vivir con más comodidad."
-        name="Jessica L."
-        position="Especialista en Marketing"
-        avatar={avatar3}
-      />
-    </div>
-  </section>
-);
+        <TestimonialCard
+          rating={4.5}
+          title="Control de gastos"
+          quote="Los conocimientos y desgloses visuales realmente me ayudan a entender mis hábitos de gasto. Ahora tengo un control total, lo que me permite mejorar mis finanzas."
+          name="Mark T."
+          position="Profesor"
+          avatar={avatar2}
+          isVisible={testimonialsInView}
+          delay="0.2s"
+        />
 
-// Componente de CTA
-const CtaSection = () => (
-  <section className="landing-cta-section">
-    <div className="landing-cta-container">
-      <div className="landing-cta-mobile">
-        <img src={ctaMobileImg} alt="Interfaz de la aplicación móvil" />
+        <TestimonialCard
+          rating={4.9}
+          title="Gestión"
+          quote="¡Esta aplicación ha transformado completamente la forma en que gestiono mi dinero! Finalmente puedo ahorrar cada mes y vivir con más comodidad."
+          name="Jessica L."
+          position="Especialista en Marketing"
+          avatar={avatar3}
+          isVisible={testimonialsInView}
+          delay="0.4s"
+        />
       </div>
-      <div className="landing-cta-content">
-        <h2>Toma el control de tus finanzas con Mi Riqueza</h2>
-        <p>
-          Comienza gratis y desbloquea potentes herramientas para rastrear
-          gastos, gestionar presupuestos y aumentar tus ahorros.
-        </p>
-        <Link to="/register" className="landing-cta-button">Comenzar Gratis</Link>
+    </section>
+  );
+};
+
+// Componente de CTA con animación
+const CtaSection = () => {
+  const { ref: ctaRef, inView: ctaInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  return (
+    <section className="landing-cta-section" ref={ctaRef}>
+      <div className="landing-cta-container">
+        <div className={`landing-cta-mobile ${ctaInView ? 'animate-slide-in-left' : ''}`}>
+          <img src={ctaMobileImg} alt="Interfaz de la aplicación móvil" />
+        </div>
+        <div className={`landing-cta-content ${ctaInView ? 'animate-slide-in-right' : ''}`}>
+          <h2>Toma el control de tus finanzas con Mi Riqueza</h2>
+          <p>
+            Comienza gratis y desbloquea potentes herramientas para rastrear
+            gastos, gestionar presupuestos y aumentar tus ahorros.
+          </p>
+          <Link to="/register" className="landing-cta-button">Comenzar Gratis</Link>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // Componente Footer
 const Footer = () => {
