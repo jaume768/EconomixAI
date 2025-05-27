@@ -49,10 +49,14 @@ const refreshTokenValidators = [
     .withMessage('Refresh token es requerido'),
 ];
 
+// Middleware de autenticación
+const { authenticateJWT } = require('../middleware/authMiddleware');
+
 // Rutas de autenticación
 router.post('/register', registerValidators, authController.register);
 router.post('/login', loginValidators, authController.login);
 router.post('/google', passport.authenticate('google-token', { session: false }), authController.googleAuth);
 router.post('/refresh-token', refreshTokenValidators, authController.refreshToken);
+router.get('/profile', authenticateJWT, authController.profile);
 
 module.exports = router;

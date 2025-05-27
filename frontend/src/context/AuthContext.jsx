@@ -53,7 +53,8 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.data.success) {
-        const { token, user } = response.data;
+        const { tokens, user } = response.data;
+        const token = tokens.access_token;
         
         // Guardar token en localStorage
         localStorage.setItem('token', token);
@@ -80,6 +81,21 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`/api/auth/register`, userData);
 
       if (response.data.success) {
+        // Si queremos que el usuario inicie sesión automáticamente después del registro
+        // descomentar estas líneas:
+        /*
+        const { tokens, user } = response.data;
+        const token = tokens.access_token;
+        
+        // Guardar token en localStorage
+        localStorage.setItem('token', token);
+        
+        // Configurar el token en el header de todas las solicitudes
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        setUser(user);
+        setIsAuthenticated(true);
+        */
         return true;
       } else {
         setError(response.data.message || 'Error en el registro');

@@ -306,3 +306,57 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+
+// Obtener perfil del usuario autenticado
+exports.profile = async (req, res) => {
+  try {
+    // La autenticación ya ha sido verificada por el middleware
+    const userId = req.user.id;
+    
+    // Obtener los datos del usuario
+    const [users] = await pool.query(
+      'SELECT id, username, email, first_name, last_name FROM users WHERE id = ?',
+      [userId]
+    );
+    
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+    
+    const user = users[0];
+    
+    // Obtener roles del usuario
+    const [roles] = await pool.query(
+      `SELECT r.name FROM roles r 
+       JOIN user_roles ur ON r.id = ur.role_id 
+       WHERE ur.user_id = ?`,
+      [userId]
+    );
+    
+    // Obtener planes del usuario
+    const [plans] = await pool.query(
+      `SELECT p.name FROM plans p 
+       JOIN user_plans up ON p.id = up.plan_id 
+       WHERE up.user_id = ?`,
+      [userId]
+    );
+    
+    res.json({
+      success: true,
+      user: {
+        ...user,
+        roles: roles.map(role => role.name),
+        plans: plans.map(plan => plan.name)
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener perfil del usuario:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error en el servidor'
+    });
+  }
+};

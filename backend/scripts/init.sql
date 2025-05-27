@@ -344,7 +344,7 @@ INSERT INTO categories (name, parent_id) VALUES
 
 -- Usuario de ejemplo para pruebas
 INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES
-('admin', 'admin@gmail.com', '$2a$10$PjBYO84PFmQNkFdOVf0ZOeI/L23exHLJM0P4ty2gRD5FOKNT/ETZm', 'Jaume', 'Fernandez');
+('admin', 'admin@gmail.com', '$2a$10$z.xh9hrsk5f/ZSRshe534u3AOQyGTlNWpAaErwjET71.OAMfQbFG.', 'Jaume', 'Fernandez');
 
 -- Asignar rol y plan al usuario
 INSERT INTO user_roles (user_id, role_id) VALUES (1, 1);

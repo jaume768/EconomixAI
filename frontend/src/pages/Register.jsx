@@ -6,7 +6,9 @@ import './Register.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -27,7 +29,9 @@ const Register = () => {
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.name) errors.name = 'El nombre es obligatorio';
+    if (!formData.username) errors.username = 'El nombre de usuario es obligatorio';
+    if (!formData.first_name) errors.first_name = 'El nombre es obligatorio';
+    if (!formData.last_name) errors.last_name = 'El apellido es obligatorio';
     if (!formData.email) errors.email = 'El correo electrónico es obligatorio';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'El correo electrónico no es válido';
     
@@ -56,7 +60,9 @@ const Register = () => {
     
     // Intentar registro
     const success = await register({
-      name: formData.name,
+      username: formData.username,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
       email: formData.email,
       password: formData.password
     });
@@ -85,19 +91,51 @@ const Register = () => {
           
           <form className="register-form" onSubmit={handleRegister} noValidate>
             <div className="register-form-group">
-              <label className="register-label" htmlFor="name">Nombre Completo</label>
+              <label className="register-label" htmlFor="username">Nombre de Usuario</label>
               <input
-                className={`register-input ${formErrors.name ? 'error' : ''}`}
-                id="name"
-                name="name"
+                className={`register-input ${formErrors.username ? 'error' : ''}`}
+                id="username"
+                name="username"
                 type="text"
-                autoComplete="name"
+                autoComplete="username"
                 autoFocus
-                value={formData.name}
+                value={formData.username}
                 onChange={handleChange}
               />
-              {formErrors.name && (
-                <div className="register-error-text">{formErrors.name}</div>
+              {formErrors.username && (
+                <div className="register-error-text">{formErrors.username}</div>
+              )}
+            </div>
+
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="first_name">Nombre</label>
+              <input
+                className={`register-input ${formErrors.first_name ? 'error' : ''}`}
+                id="first_name"
+                name="first_name"
+                type="text"
+                autoComplete="given-name"
+                value={formData.first_name}
+                onChange={handleChange}
+              />
+              {formErrors.first_name && (
+                <div className="register-error-text">{formErrors.first_name}</div>
+              )}
+            </div>
+
+            <div className="register-form-group">
+              <label className="register-label" htmlFor="last_name">Apellido</label>
+              <input
+                className={`register-input ${formErrors.last_name ? 'error' : ''}`}
+                id="last_name"
+                name="last_name"
+                type="text"
+                autoComplete="family-name"
+                value={formData.last_name}
+                onChange={handleChange}
+              />
+              {formErrors.last_name && (
+                <div className="register-error-text">{formErrors.last_name}</div>
               )}
             </div>
 
