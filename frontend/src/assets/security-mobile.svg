@@ -1,0 +1,42 @@
+<svg width="300" height="600" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Phone frame -->
+  <rect x="10" y="10" width="280" height="580" rx="30" ry="30" fill="#222" />
+  <rect x="20" y="20" width="260" height="560" rx="25" ry="25" fill="#111" />
+  
+  <!-- Screen content -->
+  <rect x="30" y="30" width="240" height="540" rx="20" ry="20" fill="#fff" />
+  
+  <!-- Header -->
+  <rect x="30" y="30" width="240" height="60" rx="20" ry="20" fill="#f8f8f8" />
+  <text x="60" y="67" font-family="Arial" font-size="16" fill="#333">Security</text>
+  
+  <!-- Main content -->
+  <circle cx="150" cy="200" r="60" fill="#6c5ce7" opacity="0.1" />
+  <circle cx="150" cy="200" r="50" fill="#6c5ce7" opacity="0.2" />
+  <circle cx="150" cy="200" r="40" fill="#6c5ce7" />
+  
+  <!-- Checkmark -->
+  <path d="M135 200 L145 210 L165 190" stroke="white" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Payment info -->
+  <rect x="60" y="290" width="180" height="50" rx="10" ry="10" fill="#f8f8f8" />
+  <text x="80" y="315" font-family="Arial" font-size="14" fill="#333">Payment Verified</text>
+  <text x="80" y="330" font-family="Arial" font-size="12" fill="#777">$178.00</text>
+  
+  <!-- Receipt details -->
+  <line x1="60" y1="360" x2="240" y2="360" stroke="#eee" stroke-width="1" />
+  <text x="60" y="380" font-family="Arial" font-size="12" fill="#777">Subtotal</text>
+  <text x="220" y="380" font-family="Arial" font-size="12" fill="#777" text-anchor="end">$160.00</text>
+  
+  <line x1="60" y1="390" x2="240" y2="390" stroke="#eee" stroke-width="1" />
+  <text x="60" y="410" font-family="Arial" font-size="12" fill="#777">Tax</text>
+  <text x="220" y="410" font-family="Arial" font-size="12" fill="#777" text-anchor="end">$18.00</text>
+  
+  <line x1="60" y1="420" x2="240" y2="420" stroke="#eee" stroke-width="1" />
+  <text x="60" y="440" font-family="Arial" font-size="12" font-weight="bold" fill="#333">Total</text>
+  <text x="220" y="440" font-family="Arial" font-size="12" font-weight="bold" fill="#333" text-anchor="end">$178.00</text>
+  
+  <!-- Button -->
+  <rect x="60" y="480" width="180" height="40" rx="20" ry="20" fill="#6c5ce7" />
+  <text x="150" y="505" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Confirm Payment</text>
+</svg>

@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Goals from './pages/Goals';
 import Challenges from './pages/Challenges';
 import Achievements from './pages/Achievements';
+import LandingPage from './pages/LandingPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -43,10 +44,19 @@ function App() {
   return (
     <div className={mode === 'dark' ? 'dark-mode' : 'light-mode'}>
       <Routes>
+        {/* Mostrar la landing page cuando el usuario no está autenticado */}
+        <Route path="/" element={!isAuthenticated ? <LandingPage /> : 
+          <ProtectedRoute>
+            <Layout>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        } />
+
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
         
-        <Route path="/" element={
+        <Route path="/dashboard" element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>

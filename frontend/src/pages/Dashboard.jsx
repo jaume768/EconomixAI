@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import './Dashboard.css';
+import './css/Dashboard.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
 import { getUserGoals } from '../services/goalService';

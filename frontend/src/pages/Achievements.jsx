@@ -5,7 +5,7 @@ import {
   faLock,
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
-import './Achievements.css';
+import './css/Achievements.css';
 import { getUserAchievements } from '../services/achievementService';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import './Goals.css';
+import './css/Goals.css';
 
 const goalTypes = [
   { value: 'ahorro', label: 'Ahorro' },

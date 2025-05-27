@@ -7,7 +7,7 @@ import {
   faTrophy,
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
-import './Challenges.css';
+import './css/Challenges.css';
 import { getChallenges, getUserChallenges, joinChallenge, leaveChallenge } from '../services/challengeService';
 import { useAuth } from '../context/AuthContext';
 import { format, isBefore, parseISO, differenceInDays } from 'date-fns';
