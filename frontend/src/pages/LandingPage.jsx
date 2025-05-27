@@ -29,7 +29,7 @@ const Header = () => (
           <path d="M8 12H16M8 8H16M8 16H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </div>
-      <span>Mi Riqueza</span>
+      <span>EconomixAI</span>
     </div>
     <nav className="landing-nav">
       <ul>
@@ -55,22 +55,22 @@ const HeroSection = () => {
     <section className="landing-hero-section" ref={heroRef}>
       <div className={`landing-hero-content ${heroInView ? 'animate-fade-in-left' : ''}`}>
         <h1>
-          <span className="landing-highlight">Optimiza</span> tus<br />
-          gastos financieros
+          Tu <span className="landing-highlight">asesor financiero</span><br />
+          personal con IA
         </h1>
         <p>
-          Bienvenido a Mi Riqueza, ya sea que estés planificando tu jubilación,
-          invirtiendo en acciones o gestionando tu presupuesto, estamos aquí para
-          guiarte en cada paso.
+          EconomixAI democratiza la planificación financiera con inteligencia artificial.
+          Un asesor disponible 24/7, asequible y automatizado que te ayuda a mejorar
+          tu salud financiera sin depender de asesores tradicionales costosos.
         </p>
         <div className="landing-cta-buttons">
-          <Link to="/register" className="landing-try-now-button">Pruébalo Ahora</Link>
-          <a href="#learn-more" className="landing-learn-more-button">Más Información <span>→</span></a>
+          <Link to="/register" className="landing-try-now-button">Comenzar Gratis</Link>
+          <a href="#learn-more" className="landing-learn-more-button">Conoce Nuestros Planes <span>→</span></a>
         </div>
       </div>
       <div className={`landing-hero-images ${heroInView ? 'animate-fade-in-right' : ''}`}>
-        <img src={mobileImg1} alt="Panel móvil mostrando saldo de $789,500" className="landing-mobile-img1" />
-        <img src={mobileImg2} alt="Estadísticas móviles mostrando análisis de gastos" className="landing-mobile-img2" />
+        <img src={mobileImg1} alt="Panel móvil mostrando dashboard financiero" className="landing-mobile-img1" />
+        <img src={mobileImg2} alt="Estadísticas móviles con análisis de gastos" className="landing-mobile-img2" />
       </div>
     </section>
   );
@@ -98,34 +98,34 @@ const ToolsSection = () => {
   return (
     <section className="landing-tools-section" id="tools" ref={toolsRef}>
       <h2 className={`landing-section-title ${toolsInView ? 'animate-fade-in-down' : ''}`}>
-        Herramientas <span className="landing-highlight">Esenciales</span>
+        Funcionalidades <span className="landing-highlight">Inteligentes</span>
       </h2>
       <p className={`landing-section-subtitle ${toolsInView ? 'animate-fade-in-down' : ''}`}>
-        Explora las potentes funciones y herramientas que Mi Riqueza ofrece para
-        optimizar tu gestión financiera y mejorar tu experiencia de inversión.
+        Nuestro asesor financiero con IA te ofrece herramientas avanzadas para analizar,
+        planificar y optimizar tus finanzas personales o familiares.
       </p>
 
       <div className="landing-tools-grid">
         <ToolCard
           icon={expenseIcon}
-          title="Seguimiento de Gastos"
-          description="Registra y categoriza fácilmente todos tus gastos. Obtén una visión clara de a dónde va tu dinero y gestiona tu presupuesto en tiempo real."
+          title="Recomendaciones Personalizadas"
+          description="Recibe consejos financieros adaptados a tu perfil de riesgo y objetivos. Nuestro sistema de IA genera presupuestos sugeridos y tips de ahorro específicos para ti."
           isVisible={toolsInView}
           delay="0s"
         />
 
         <ToolCard
           icon={smartBudgetIcon}
-          title="Presupuestación Inteligente"
-          description="Planifica, gestiona y personaliza presupuestos sin esfuerzo, asigna fondos, controla gastos y sigue el progreso hacia tus metas con facilidad."
+          title="Alertas y Previsiones"
+          description="Mantente informado con alertas proactivas para pagos próximos y gastos inusuales. Visualiza tu cash-flow a futuro para detectar posibles tensiones de liquidez."
           isVisible={toolsInView}
           delay="0.2s"
         />
 
         <ToolCard
           icon={goalIcon}
-          title="Ahorro Orientado a Objetivos"
-          description="Establece objetivos de ahorro significativos, sigue el progreso en tiempo real y utiliza recomendaciones personalizadas para hacer realidad tus metas."
+          title="Simulador 'What-if'"
+          description="Explora diferentes escenarios financieros y visualiza cómo afectarían tus decisiones a tu economía. Planifica a 3, 6 y 12 meses con proyecciones basadas en tus datos reales."
           isVisible={toolsInView}
           delay="0.4s"
         />
@@ -159,11 +159,11 @@ const SecuritySection = () => {
   return (
     <section className="landing-security-section" id="security" ref={securityRef}>
       <h2 className={`landing-section-title ${securityInView ? 'animate-fade-in-down' : ''}`}>
-        Tu <span className="landing-highlight">seguridad</span> es nuestra prioridad
+        Seguridad y <span className="landing-highlight">Cumplimiento</span> Normativo
       </h2>
       <p className={`landing-section-subtitle ${securityInView ? 'animate-fade-in-down' : ''}`}>
-        Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
-        cada etapa de tu viaje financiero.
+        Protegemos tus datos financieros con los más altos estándares de seguridad y
+        cumplimos con todas las regulaciones aplicables del sector financiero.
       </p>
 
       <div className="landing-security-container">
@@ -172,16 +172,16 @@ const SecuritySection = () => {
             <div className="landing-security-icon">
               <img src={privacyIcon} alt="Icono de privacidad de datos" />
             </div>
-            <h3>Cumplimiento de Privacidad de Datos</h3>
-            <p>Cumplimos totalmente con leyes de protección de datos como RGPD y CCPA.</p>
+            <h3>Cumplimiento GDPR</h3>
+            <p>Garantizamos tu derecho al olvido y requerimos tu consentimiento explícito para el tratamiento de datos personales.</p>
           </div>
 
           <div className={`landing-security-card ${securityInView ? 'animate-slide-in-left' : ''}`} style={{ transitionDelay: '0.3s' }}>
             <div className="landing-security-icon">
               <img src={authIcon} alt="Icono de autenticación" />
             </div>
-            <h3>Autenticación Segura</h3>
-            <p>La autenticación de dos factores (2FA) y opciones de inicio de sesión biométrico añaden una capa extra de seguridad.</p>
+            <h3>Autenticación de Dos Factores</h3>
+            <p>Implementamos 2FA para todas las cuentas, asegurando que solo tú puedas acceder a tu información financiera personal.</p>
           </div>
         </div>
 
@@ -194,16 +194,16 @@ const SecuritySection = () => {
             <div className="landing-security-icon">
               <img src={encryptionIcon} alt="Icono de encriptación" />
             </div>
-            <h3>Encriptación de Nivel Bancario</h3>
-            <p>Toda la información sensible está protegida con estándares avanzados de encriptación (AES-256).</p>
+            <h3>Tokenización y Cifrado</h3>
+            <p>Utilizamos cifrado de extremo a extremo y tokenización para proteger tus datos bancarios con estándares de nivel financiero.</p>
           </div>
 
           <div className={`landing-security-card ${securityInView ? 'animate-slide-in-right' : ''}`} style={{ transitionDelay: '0.3s' }}>
             <div className="landing-security-icon">
               <img src={monitoringIcon} alt="Icono de monitorización" />
             </div>
-            <h3>Monitorización 24/7</h3>
-            <p>Nuestro equipo de seguridad monitorea el sistema las 24 horas del día para detectar y prevenir cualquier actividad sospechosa.</p>
+            <h3>Auditorías de Seguridad</h3>
+            <p>Realizamos auditorías de seguridad regulares (pentesting) y cumplimos con los estándares ISO 27001 para garantizar la protección de tus datos.</p>
           </div>
         </div>
       </div>
@@ -243,42 +243,42 @@ const TestimonialsSection = () => {
   return (
     <section className="landing-testimonials-section" id="testimonials" ref={testimonialsRef}>
       <h2 className={`landing-section-title ${testimonialsInView ? 'animate-fade-in-down' : ''}`}>
-        Lo que nuestros <span className="landing-highlight">usuarios</span> dicen
+        Historias de <span className="landing-highlight">Éxito</span> Financiero
       </h2>
       <p className={`landing-section-subtitle ${testimonialsInView ? 'animate-fade-in-down' : ''}`}>
-        Desde estrategias de inversión hasta planes de ahorro, tenemos opciones para
-        cada etapa de tu viaje financiero.
+        Descubre cómo nuestro asesor financiero con IA ha ayudado a personas reales a
+        mejorar su salud financiera y alcanzar sus objetivos económicos.
       </p>
 
       <div className="landing-testimonials-grid">
         <TestimonialCard
-          rating={4}
-          title="Facilidad de uso"
-          quote="Me encanta la sencillez de esta aplicación. El seguimiento de gastos y los recordatorios me han hecho más constante con mi planificación financiera. ¡Muy recomendable!"
-          name="Sarah W."
-          position="Autónoma"
+          rating={4.8}
+          title="Finanzas Familiares"
+          quote="Las proyecciones de cash-flow y el simulador 'What-if' nos permitieron planificar la educación de nuestros hijos y al mismo tiempo mantener nuestro presupuesto mensual bajo control."
+          name="Laura M."
+          position="Madre de familia"
           avatar={avatar1}
           isVisible={testimonialsInView}
           delay="0s"
         />
 
         <TestimonialCard
-          rating={4.5}
-          title="Control de gastos"
-          quote="Los conocimientos y desgloses visuales realmente me ayudan a entender mis hábitos de gasto. Ahora tengo un control total, lo que me permite mejorar mis finanzas."
-          name="Mark T."
-          position="Profesor"
+          rating={4.9}
+          title="Ahorros Automáticos"
+          quote="Las alertas proactivas me han ahorrado cientos de euros en pagos innecesarios. La IA detectó suscripciones duplicadas y gastos recurrentes que ni siquiera sabía que tenía."
+          name="Carlos R."
+          position="Emprendedor"
           avatar={avatar2}
           isVisible={testimonialsInView}
           delay="0.2s"
         />
 
         <TestimonialCard
-          rating={4.9}
-          title="Gestión"
-          quote="¡Esta aplicación ha transformado completamente la forma en que gestiono mi dinero! Finalmente puedo ahorrar cada mes y vivir con más comodidad."
-          name="Jessica L."
-          position="Especialista en Marketing"
+          rating={5.0}
+          title="Decisiones Informadas"
+          quote="Las recomendaciones personalizadas cambiaron mi perspectiva financiera. En solo 6 meses, he creado un fondo de emergencia y estoy en camino de comprar mi primera vivienda."
+          name="Elena B."
+          position="Analista de Datos"
           avatar={avatar3}
           isVisible={testimonialsInView}
           delay="0.4s"
@@ -302,12 +302,11 @@ const CtaSection = () => {
           <img src={ctaMobileImg} alt="Interfaz de la aplicación móvil" />
         </div>
         <div className={`landing-cta-content ${ctaInView ? 'animate-slide-in-right' : ''}`}>
-          <h2>Toma el control de tus finanzas con Mi Riqueza</h2>
+          <h2>Tu Asesor Financiero Personal, Siempre Disponible</h2>
           <p>
-            Comienza gratis y desbloquea potentes herramientas para rastrear
-            gastos, gestionar presupuestos y aumentar tus ahorros.
+            Comienza gratis con nuestro plan básico y visualiza tus finanzas.
           </p>
-          <Link to="/register" className="landing-cta-button">Comenzar Gratis</Link>
+          <Link to="/register" className="landing-cta-button">Comenzar Gratis Ahora</Link>
         </div>
       </div>
     </section>
@@ -322,10 +321,10 @@ const Footer = () => {
     <footer className="landing-footer">
       <div className="landing-footer-content">
         <div className="landing-footer-column">
-          <h3>Mi Riqueza</h3>
+          <h3>EconomixAI</h3>
           <p>
-            Bienvenido a Mi Riqueza, donde creemos en empoderar a las personas para
-            tomar control de su futuro financiero.
+            Democratizamos la planificación financiera mediante inteligencia artificial.
+            Nuestro objetivo es hacer accesible el asesoramiento financiero de calidad para todos.
           </p>
           <div className="landing-social-links">
             <a href="#" aria-label="Facebook"><FaFacebook /></a>
@@ -347,21 +346,21 @@ const Footer = () => {
         <div className="landing-footer-column">
           <h3>Recursos</h3>
           <ul>
-            <li><a href="#careers">Carreras</a></li>
-            <li><a href="#blog">Blog</a></li>
-            <li><a href="#legal">Legal</a></li>
+            <li><a href="#planes">Planes y Precios</a></li>
+            <li><a href="#blog">Blog Financiero</a></li>
+            <li><a href="#guias">Guías y Tutoriales</a></li>
           </ul>
         </div>
 
         <div className="landing-footer-column">
           <h3>Contáctanos</h3>
           <p className="landing-contact-info">123-456790</p>
-          <p className="landing-contact-info">miwealth@contact.com</p>
+          <p className="landing-contact-info">economixai@contact.com</p>
         </div>
       </div>
 
       <div className="landing-footer-bottom">
-        <p>Copyright &copy; Chyvo {currentYear}. Todos los derechos reservados</p>
+        <p>Copyright &copy; EconomixAI {currentYear}. Cumplimiento GDPR y PSD2. Todos los derechos reservados.</p>
       </div>
     </footer>
   );

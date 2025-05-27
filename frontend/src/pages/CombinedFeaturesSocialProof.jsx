@@ -16,10 +16,10 @@ const CombinedFeaturesSocialProof = () => {
           <div className="landing-feature-icon">
             <img src={budgetIcon} alt="Icono de presupuesto" />
           </div>
-          <h3>Presupuesto Personalizado</h3>
+          <h3>Análisis Automático de Gastos</h3>
           <p>
-            Crea flujos de presupuestación personalizados para objetivos individuales.
-            Define límites y categorías para alcanzar tus metas.
+            Nuestro sistema de IA analiza automáticamente tus ingresos y gastos, categorizando
+            transacciones y detectando patrones para ayudarte a optimizar tu economía.
           </p>
         </div>
 
@@ -27,9 +27,10 @@ const CombinedFeaturesSocialProof = () => {
           <div className="landing-feature-icon">
             <img src={teamIcon} alt="Icono de equipo" />
           </div>
-          <h3>Seguimiento de Gastos de Equipo</h3>
+          <h3>Planes Personales y Familiares</h3>
           <p>
-            Gestiona finanzas en múltiples cuentas y asigna responsabilidades de forma sencilla.
+            Gestiona tus finanzas individualmente o crea un grupo familiar para compartir
+            presupuestos, ver gastos conjuntos y fijar objetivos grupales.
           </p>
         </div>
       </div>
@@ -40,9 +41,9 @@ const CombinedFeaturesSocialProof = () => {
           <div className="landing-avatar"></div>
           <div className="landing-avatar"></div>
           <div className="landing-avatar"></div>
-          <div className="landing-avatar-more">5M+</div>
+          <div className="landing-avatar-more">97%</div>
         </div>
-        <p>Descargado más de 5M+ en un año</p>
+        <p>97% de usuarios mejoraron sus finanzas en 3 meses</p>
       </div>
     </section>
   );
