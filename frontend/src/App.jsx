@@ -45,16 +45,10 @@ function App() {
     <div className={mode === 'dark' ? 'dark-mode' : 'light-mode'}>
       <Routes>
         {/* Mostrar la landing page cuando el usuario no está autenticado */}
-        <Route path="/" element={!isAuthenticated ? <LandingPage /> : 
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        } />
+        <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to="/dashboard" />} />
 
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
         
         <Route path="/dashboard" element={
           <ProtectedRoute>
