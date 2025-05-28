@@ -176,7 +176,7 @@
 .landing-features-social {
   flex-wrap: wrap;
   background: linear-gradient(135deg, #003554, #006494);
-  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%);
   padding: 4rem 2rem 2rem;
   gap: 2rem;
   max-width: 1500px;
@@ -195,7 +195,7 @@
   flex: 1;
   background: transparent;
   color: #fff;
-  padding: 2rem;
+  padding: 4rem;
   border-radius: 12px;
 }
 

@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [justRegistered, setJustRegistered] = useState(false);
 
   useEffect(() => {
     // Verificar si hay un token en localStorage al cargar
@@ -81,21 +82,23 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`/api/auth/register`, userData);
 
       if (response.data.success) {
-        // Si queremos que el usuario inicie sesión automáticamente después del registro
-        // descomentar estas líneas:
-        /*
+        // Iniciar sesión automáticamente después del registro
         const { tokens, user } = response.data;
-        const token = tokens.access_token;
         
-        // Guardar token en localStorage
-        localStorage.setItem('token', token);
+        if (tokens && tokens.access_token) {
+          const token = tokens.access_token;
+          
+          // Guardar token en localStorage
+          localStorage.setItem('token', token);
+          
+          // Configurar el token en el header de todas las solicitudes
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
+          setUser(user);
+          setIsAuthenticated(true);
+          setJustRegistered(true);
+        }
         
-        // Configurar el token en el header de todas las solicitudes
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-        setUser(user);
-        setIsAuthenticated(true);
-        */
         return true;
       } else {
         setError(response.data.message || 'Error en el registro');
@@ -117,6 +120,7 @@ export const AuthProvider = ({ children }) => {
     // Resetear estado
     setUser(null);
     setIsAuthenticated(false);
+    setJustRegistered(false);
   };
 
   const updateProfile = async (userData) => {
@@ -142,6 +146,9 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     loading,
     error,
+    setError,
+    justRegistered,
+    setJustRegistered,
     login,
     register,
     logout,

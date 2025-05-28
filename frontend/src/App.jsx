@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   const { mode } = useTheme();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, justRegistered } = useAuth();
   const [appReady, setAppReady] = useState(false);
   
   useEffect(() => {
@@ -48,7 +48,7 @@ function App() {
         <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to="/dashboard" />} />
 
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!isAuthenticated || justRegistered ? <Register /> : <Navigate to="/dashboard" />} />
         
         <Route path="/dashboard" element={
           <ProtectedRoute>

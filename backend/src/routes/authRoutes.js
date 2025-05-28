@@ -52,7 +52,20 @@ const refreshTokenValidators = [
 // Middleware de autenticación
 const { authenticateJWT } = require('../middleware/authMiddleware');
 
+// Validadores para el código de verificación
+const verificationCodeValidators = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email no válido'),
+  body('code')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('El código debe tener 6 dígitos')
+];
+
 // Rutas de autenticación
+router.post('/send-verification-code', authController.sendVerificationCode);
+router.post('/verify-code', verificationCodeValidators, authController.verifyCode);
 router.post('/register', registerValidators, authController.register);
 router.post('/login', loginValidators, authController.login);
 router.post('/google', passport.authenticate('google-token', { session: false }), authController.googleAuth);
