@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 import './css/Dashboard.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
@@ -9,11 +8,11 @@ import { getUserChallenges } from '../services/challengeService';
 import { getUserAchievements } from '../services/achievementService';
 import { format, parseISO, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { FaWallet, FaArrowUp, FaArrowDown, FaCreditCard, FaChartLine, FaCalendarAlt, FaHistory, FaRegLightbulb, FaTrophy, FaTasks, FaHome } from 'react-icons/fa';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { mode } = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [financialSummary, setFinancialSummary] = useState(null);
@@ -57,19 +56,22 @@ const Dashboard = () => {
 
         setActiveGoals(
           (goalsResponse.goals || [])
-            .filter(g => !g.completed)
-            .sort((a, b) => calculateProgress(b) - calculateProgress(a))
+            .filter(g => g.current_amount < g.target_amount) // Usa las nuevas propiedades
+            .sort((a, b) => (b.current_amount/b.target_amount) - (a.current_amount/a.target_amount))
             .slice(0, 3)
         );
 
         setActiveChallenges(
           (challengesResponse.challenges || [])
-            .filter(c => {
-              const progress = c.progress ? JSON.parse(c.progress) : {};
-              return !progress.complete && !progress.expired;
-            })
+            .filter(c => c.status === 'active') // Usa el nuevo campo status
             .slice(0, 3)
         );
+        
+        // Añadimos log para depuración
+        console.log('Financial Summary:', summaryResponse.summary);
+        console.log('Goals:', goalsResponse.goals);
+        console.log('Challenges:', challengesResponse.challenges);
+        console.log('Achievements:', achievementsResponse.achievements);
 
         setRecentAchievements(
           (achievementsResponse.achievements || [])
@@ -88,10 +90,6 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [user]);
 
-  const calculateProgress = (goal) => {
-    return Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100));
-  };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
   };
@@ -104,22 +102,26 @@ const Dashboard = () => {
     }
   };
 
-  const getChallengeProgress = (challenge) => {
+  const calculateProgress = (goal) => {
     try {
-      const progress = typeof challenge.progress === 'string'
-        ? JSON.parse(challenge.progress)
-        : challenge.progress || { current: 0, target: 1 };
-
-      if (progress.complete) return 100;
-      if (!progress.current || !progress.target) return 0;
-
-      return Math.min(100, Math.round((progress.current / progress.target) * 100));
+      if (!goal || !goal.target_amount) return 0;
+      return Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100));
     } catch (e) {
+      console.error('Error calculando progreso de meta:', e);
       return 0;
     }
   };
 
-  // Preparar datos para gráficos
+  const getChallengeProgress = (challenge) => {
+    try {
+      if (!challenge || !challenge.target_value) return 0;
+      return Math.min(100, Math.round((challenge.current_value / challenge.target_value) * 100));
+    } catch (e) {
+      console.error('Error calculando progreso de desafío:', e);
+      return 0;
+    }
+  };
+
   const getChartData = () => {
     if (!financialSummary || !financialSummary.categoryBreakdown) {
       return {
@@ -177,7 +179,30 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={`dashboard-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+    <div className="dashboard-container">
+      <nav className="dashboard-nav">
+        <div className="dashboard-logo">
+          <div className="dashboard-logo-circle">
+            <FaWallet />
+          </div>
+          <span>EconomixAI</span>
+        </div>
+        <div className="dashboard-nav-links">
+          <Link to="/" className="dashboard-nav-link active">
+            <FaHome /> <span>Inicio</span>
+          </Link>
+          <Link to="/transactions" className="dashboard-nav-link">
+            <FaHistory /> <span>Transacciones</span>
+          </Link>
+          <Link to="/goals" className="dashboard-nav-link">
+            <FaTasks /> <span>Metas</span>
+          </Link>
+          <Link to="/achievements" className="dashboard-nav-link">
+            <FaTrophy /> <span>Logros</span>
+          </Link>
+        </div>
+      </nav>
+
       {error && (
         <div className="dashboard-error">
           {error}
@@ -186,7 +211,7 @@ const Dashboard = () => {
 
       <div className="dashboard-header">
         <h1 className="dashboard-title">
-          Bienvenido, {user?.name?.split(' ')[0] || 'Usuario'}
+          Bienvenido, <span className="dashboard-highlight">{user?.first_name || 'Usuario'}</span>
         </h1>
         <p className="dashboard-subtitle">
           Resumen de tu situación financiera y progresos
@@ -204,6 +229,7 @@ const Dashboard = () => {
               {formatCurrency(financialSummary?.totalBalance || 0)}
             </p>
             <p className="dashboard-summary-footer">
+              <FaWallet className="dashboard-summary-icon" />
               en {financialSummary?.accountCount || 0} cuenta(s)
             </p>
           </div>
@@ -218,9 +244,7 @@ const Dashboard = () => {
               {formatCurrency(financialSummary?.currentMonthIncome || 0)}
             </p>
             <div className="dashboard-summary-footer">
-              <span className="dashboard-summary-icon">
-                <i className="fas fa-arrow-up"></i>
-              </span>
+              <FaArrowUp className="dashboard-summary-icon" />
               <span>
                 {financialSummary?.incomeChangePercentage > 0 ? '+' : ''}
                 {financialSummary?.incomeChangePercentage || 0}% vs. mes anterior
@@ -238,9 +262,7 @@ const Dashboard = () => {
               {formatCurrency(Math.abs(financialSummary?.currentMonthExpenses || 0))}
             </p>
             <div className="dashboard-summary-footer">
-              <span className="dashboard-summary-icon">
-                <i className="fas fa-arrow-down"></i>
-              </span>
+              <FaArrowDown className="dashboard-summary-icon" />
               <span>
                 {financialSummary?.expenseChangePercentage > 0 ? '+' : ''}
                 {financialSummary?.expenseChangePercentage || 0}% vs. mes anterior
@@ -258,6 +280,7 @@ const Dashboard = () => {
               {formatCurrency(financialSummary?.totalDebt || 0)}
             </p>
             <p className="dashboard-summary-footer">
+              <FaCreditCard className="dashboard-summary-icon" />
               {financialSummary?.debtCount || 0} deuda(s) activa(s)
             </p>
           </div>
@@ -269,13 +292,40 @@ const Dashboard = () => {
         <div className="dashboard-col-xs-12 dashboard-col-md-7">
           <div className="dashboard-card dashboard-chart-container">
             <h2 className="dashboard-chart-title">
-              Ingresos y Gastos (Últimos 6 meses)
+              <FaChartLine className="dashboard-chart-icon" /> Ingresos y Gastos (Últimos 6 meses)
             </h2>
             <div className="dashboard-chart">
               {barData.months.length > 0 ? (
-                <div className="dashboard-chart">
-                  {/* Replace with pure CSS/HTML chart or a lightweight chart library */}
-                  <div>Chart would be rendered here with pure CSS or a lightweight library</div>
+                <div className="dashboard-chart-content">
+                  <div className="dashboard-chart-legend">
+                    <div className="dashboard-chart-legend-item">
+                      <span className="dashboard-chart-legend-color income"></span>
+                      <span className="dashboard-chart-legend-label">Ingresos</span>
+                    </div>
+                    <div className="dashboard-chart-legend-item">
+                      <span className="dashboard-chart-legend-color expense"></span>
+                      <span className="dashboard-chart-legend-label">Gastos</span>
+                    </div>
+                  </div>
+                  <div className="dashboard-bar-chart">
+                    {barData.months.map((month, index) => (
+                      <div key={month} className="dashboard-bar-chart-column">
+                        <div className="dashboard-bar-chart-bars">
+                          <div 
+                            className="dashboard-bar-chart-bar income" 
+                            style={{ height: `${Math.min(100, barData.income[index] ? (barData.income[index] / Math.max(...barData.income) * 100) : 0)}%` }}
+                            title={`Ingresos: ${formatCurrency(barData.income[index] || 0)}`}
+                          ></div>
+                          <div 
+                            className="dashboard-bar-chart-bar expense" 
+                            style={{ height: `${Math.min(100, barData.expenses[index] ? (barData.expenses[index] / Math.max(...barData.expenses) * 100) : 0)}%` }}
+                            title={`Gastos: ${formatCurrency(barData.expenses[index] || 0)}`}
+                          ></div>
+                        </div>
+                        <div className="dashboard-bar-chart-label">{month}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="dashboard-chart-empty">
@@ -289,13 +339,23 @@ const Dashboard = () => {
         <div className="dashboard-col-xs-12 dashboard-col-md-5">
           <div className="dashboard-card dashboard-chart-container">
             <h2 className="dashboard-chart-title">
-              Distribución de Gastos por Categoría
+              <FaRegLightbulb className="dashboard-chart-icon" /> Distribución de Gastos por Categoría
             </h2>
             <div className="dashboard-chart">
               {pieData.length > 0 ? (
-                <div className="dashboard-chart">
-                  {/* Replace with pure CSS/HTML chart or a lightweight chart library */}
-                  <div>Pie chart would be rendered here with pure CSS or a lightweight library</div>
+                <div className="dashboard-pie-chart-container">
+                  <div className="dashboard-pie-chart">
+                    <div className="dashboard-pie" style={{ background: 'conic-gradient(#00A6FB 0% 25%, #0582CA 25% 55%, #006494 55% 75%, #003554 75% 100%)' }}></div>
+                  </div>
+                  <div className="dashboard-pie-legend">
+                    {pieData.map((item, index) => (
+                      <div key={index} className="dashboard-pie-legend-item">
+                        <span className={`dashboard-pie-legend-color color-${index + 1}`}></span>
+                        <span className="dashboard-pie-legend-label">{item.label}</span>
+                        <span className="dashboard-pie-legend-value">{formatCurrency(item.value)}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="dashboard-chart-empty">
@@ -314,13 +374,13 @@ const Dashboard = () => {
           <div className="dashboard-card dashboard-transactions">
             <div className="dashboard-transactions-header">
               <h2 className="dashboard-transactions-title">
-                Transacciones Recientes
+                <FaHistory className="dashboard-chart-icon" /> Transacciones Recientes
               </h2>
               <a
                 className="dashboard-transactions-link"
                 onClick={() => navigate('/transactions')}
               >
-                Ver todas <i className="fas fa-arrow-right"></i>
+                Ver todas <FaArrowDown />
               </a>
             </div>
             <div className="dashboard-divider"></div>
@@ -331,11 +391,11 @@ const Dashboard = () => {
                   <li key={transaction.id}>
                     <div className="dashboard-transaction-item">
                       <div className={`dashboard-transaction-icon ${transaction.amount > 0 ? 'dashboard-transaction-income' : 'dashboard-transaction-expense'}`}>
-                        <i className={`fas ${transaction.amount > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}`}></i>
+                        {transaction.amount > 0 ? <FaArrowUp /> : <FaArrowDown />}
                       </div>
                       <div className="dashboard-transaction-content">
                         <p className="dashboard-transaction-description">{transaction.description}</p>
-                        <p className="dashboard-transaction-date">{formatDate(transaction.date)}</p>
+                        <p className="dashboard-transaction-date">{formatDate(transaction.transaction_date)}</p>
                       </div>
                       <div className={`dashboard-transaction-amount ${transaction.amount > 0 ? 'dashboard-transaction-income-text' : 'dashboard-transaction-expense-text'}`}>
                         {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
@@ -360,13 +420,13 @@ const Dashboard = () => {
           <div className="dashboard-card dashboard-transactions">
             <div className="dashboard-goals-header">
               <h2 className="dashboard-goals-title">
-                Metas Activas
+                <FaTasks className="dashboard-chart-icon" /> Metas Activas
               </h2>
               <a
                 className="dashboard-transactions-link"
                 onClick={() => navigate('/goals')}
               >
-                Ver todas <i className="fas fa-arrow-right"></i>
+                Ver todas <FaArrowDown />
               </a>
             </div>
             <div className="dashboard-divider"></div>
@@ -377,13 +437,13 @@ const Dashboard = () => {
                   <li key={goal.id} className="dashboard-goal-item">
                     <div className="dashboard-goal-name">
                       <span className="dashboard-goal-icon">
-                        <i className="fas fa-flag"></i>
+                        <FaTasks />
                       </span>
                       {goal.name}
                     </div>
                     <div className="dashboard-goal-info">
                       <span className="dashboard-goal-dates">
-                        {formatDate(goal.target_date)}
+                        <FaCalendarAlt className="dashboard-goal-icon-small" /> {formatDate(goal.target_date)}
                       </span>
                       <span className="dashboard-goal-amount">
                         {formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)}
@@ -415,18 +475,18 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Widget de Retos Activos */}
+        {/* Widget de Retos */}
         <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
           <div className="dashboard-card dashboard-transactions">
-            <div className="dashboard-goals-header">
-              <h2 className="dashboard-goals-title">
-                Retos Activos
+            <div className="dashboard-challenges-header">
+              <h2 className="dashboard-challenges-title">
+                <FaTrophy className="dashboard-chart-icon" /> Retos Activos
               </h2>
               <a
                 className="dashboard-transactions-link"
                 onClick={() => navigate('/challenges')}
               >
-                Ver todos <i className="fas fa-arrow-right"></i>
+                Ver todos <FaArrowDown />
               </a>
             </div>
             <div className="dashboard-divider"></div>
@@ -437,14 +497,12 @@ const Dashboard = () => {
                   <li key={challenge.id} className="dashboard-challenge-item">
                     <div className="dashboard-challenge-name">
                       <span className="dashboard-challenge-icon">
-                        <i className="fas fa-trophy"></i>
+                        <FaTrophy />
                       </span>
                       {challenge.name}
                     </div>
-                    <div className="dashboard-challenge-info">
-                      <span className="dashboard-challenge-dates">
-                        {formatDate(challenge.end_date)}
-                      </span>
+                    <div className="dashboard-challenge-dates">
+                      <FaCalendarAlt className="dashboard-goal-icon-small" /> {formatDate(challenge.end_date)}
                     </div>
                     <div className="dashboard-progress-container">
                       <div

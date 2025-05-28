@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash, FaUserCircle } from 'react-icons/fa';
 import './css/Register.css';
 
 const Register = () => {
@@ -16,7 +16,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const { register, error } = useAuth();
-  const { mode } = useTheme();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -73,15 +72,17 @@ const Register = () => {
   };
 
   return (
-    <div className={`register-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+    <div className="register-container">
+      <div className="register-background"></div>
       <div className="register-box">
         <div className="register-paper">
-          <div className="register-avatar">
-            <i className="fas fa-user"></i>
+          <div className="register-header">
+            <div className="register-logo-circle">
+              <FaUserCircle />
+            </div>
+            <h1 className="register-title">EconomixAI</h1>
+            <p className="register-subtitle">Crear Cuenta</p>
           </div>
-          <h1 className="register-title">
-            Crear Cuenta
-          </h1>
           
           {error && (
             <div className="register-error">
@@ -92,16 +93,22 @@ const Register = () => {
           <form className="register-form" onSubmit={handleRegister} noValidate>
             <div className="register-form-group">
               <label className="register-label" htmlFor="username">Nombre de Usuario</label>
-              <input
-                className={`register-input ${formErrors.username ? 'error' : ''}`}
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                autoFocus
-                value={formData.username}
-                onChange={handleChange}
-              />
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaUser />
+                </div>
+                <input
+                  className={`register-input ${formErrors.username ? 'error' : ''}`}
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="Nombre de Usuario"
+                  autoComplete="username"
+                  autoFocus
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
               {formErrors.username && (
                 <div className="register-error-text">{formErrors.username}</div>
               )}
@@ -109,15 +116,21 @@ const Register = () => {
 
             <div className="register-form-group">
               <label className="register-label" htmlFor="first_name">Nombre</label>
-              <input
-                className={`register-input ${formErrors.first_name ? 'error' : ''}`}
-                id="first_name"
-                name="first_name"
-                type="text"
-                autoComplete="given-name"
-                value={formData.first_name}
-                onChange={handleChange}
-              />
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaUser />
+                </div>
+                <input
+                  className={`register-input ${formErrors.first_name ? 'error' : ''}`}
+                  id="first_name"
+                  name="first_name"
+                  type="text"
+                  placeholder="Nombre"
+                  autoComplete="given-name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                />
+              </div>
               {formErrors.first_name && (
                 <div className="register-error-text">{formErrors.first_name}</div>
               )}
@@ -125,15 +138,21 @@ const Register = () => {
 
             <div className="register-form-group">
               <label className="register-label" htmlFor="last_name">Apellido</label>
-              <input
-                className={`register-input ${formErrors.last_name ? 'error' : ''}`}
-                id="last_name"
-                name="last_name"
-                type="text"
-                autoComplete="family-name"
-                value={formData.last_name}
-                onChange={handleChange}
-              />
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaUser />
+                </div>
+                <input
+                  className={`register-input ${formErrors.last_name ? 'error' : ''}`}
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  placeholder="Apellido"
+                  autoComplete="family-name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                />
+              </div>
               {formErrors.last_name && (
                 <div className="register-error-text">{formErrors.last_name}</div>
               )}
@@ -141,15 +160,21 @@ const Register = () => {
 
             <div className="register-form-group">
               <label className="register-label" htmlFor="email">Correo Electrónico</label>
-              <input
-                className={`register-input ${formErrors.email ? 'error' : ''}`}
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaEnvelope />
+                </div>
+                <input
+                  className={`register-input ${formErrors.email ? 'error' : ''}`}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Correo Electrónico"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
               {formErrors.email && (
                 <div className="register-error-text">{formErrors.email}</div>
               )}
@@ -157,22 +182,28 @@ const Register = () => {
 
             <div className="register-form-group">
               <label className="register-label" htmlFor="password">Contraseña</label>
-              <input
-                className={`register-input ${formErrors.password ? 'error' : ''}`}
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              <button
-                type="button"
-                className="register-password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-              </button>
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaLock />
+                </div>
+                <input
+                  className={`register-input ${formErrors.password ? 'error' : ''}`}
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Contraseña"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="register-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {formErrors.password && (
                 <div className="register-error-text">{formErrors.password}</div>
               )}
@@ -180,22 +211,28 @@ const Register = () => {
 
             <div className="register-form-group">
               <label className="register-label" htmlFor="confirmPassword">Confirmar Contraseña</label>
-              <input
-                className={`register-input ${formErrors.confirmPassword ? 'error' : ''}`}
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-              <button
-                type="button"
-                className="register-password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-              </button>
+              <div className="register-input-container">
+                <div className="register-input-icon">
+                  <FaLock />
+                </div>
+                <input
+                  className={`register-input ${formErrors.confirmPassword ? 'error' : ''}`}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Confirmar Contraseña"
+                  autoComplete="new-password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="register-password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {formErrors.confirmPassword && (
                 <div className="register-error-text">{formErrors.confirmPassword}</div>
               )}
@@ -208,9 +245,10 @@ const Register = () => {
               Registrarse
             </button>
             
-            <div className="register-links">
-              <Link to="/login" className="register-link">
-                ¿Ya tienes una cuenta? Inicia sesión
+            <div className="register-login-link">
+              <span>¿Ya tienes una cuenta? </span>
+              <Link to="/login" className="register-link highlight">
+                Iniciar Sesión
               </Link>
             </div>
           </form>

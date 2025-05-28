@@ -189,14 +189,33 @@ CREATE TABLE `recurring_transactions` (
 CREATE TABLE `goals` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
   `goal_type` ENUM('ahorro','compra','viaje','jubilacion') NOT NULL,
   `target_amount` DECIMAL(15,2) NOT NULL,
+  `current_amount` DECIMAL(15,2) DEFAULT 0.00,
   `target_date` DATE NOT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_goals_user` (`user_id`),
   CONSTRAINT `fk_goals_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `challenges` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `description` VARCHAR(255) NULL,
+  `target_value` DECIMAL(15,2) NOT NULL,
+  `current_value` DECIMAL(15,2) DEFAULT 0.00,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `status` ENUM('active', 'completed', 'failed') DEFAULT 'active',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_challenges_user` (`user_id`),
+  CONSTRAINT `fk_challenges_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `achievements` (
@@ -216,15 +235,6 @@ CREATE TABLE `user_achievements` (
   PRIMARY KEY (`user_id`,`achievement_id`),
   CONSTRAINT `fk_ua_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_ua_ach`  FOREIGN KEY (`achievement_id`) REFERENCES `achievements`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `challenges` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  `description` TEXT NOT NULL,
-  `criteria` JSON NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ux_challenges_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `user_challenges` (
@@ -361,3 +371,37 @@ INSERT INTO transactions (user_id, account_id, amount, type, category_id, descri
 (1, 1, -85.50, 'expense', 14, 'Compra Mercadona', '2025-05-10'),
 (1, 1, -45.00, 'expense', 19, 'Cena con amigos', '2025-05-15'),
 (1, 1, -29.99, 'expense', 21, 'Suscripción Netflix', '2025-05-05');
+
+-- Más transacciones para mejor visualización
+INSERT INTO transactions (user_id, account_id, amount, type, category_id, description, transaction_date) VALUES
+-- Ingresos adicionales
+(1, 1, 300.00, 'income', 21, 'Trabajo freelance', '2025-05-15'),
+(1, 1, 50.00, 'income', 23, 'Dividendos', '2025-05-20'),
+-- Gastos adicionales
+(1, 1, -120.00, 'expense', 3, 'Factura luz', '2025-05-08'),
+(1, 1, -60.00, 'expense', 16, 'Repostaje gasolina', '2025-05-12'),
+(1, 1, -35.00, 'expense', 15, 'Transporte público mes', '2025-05-03'),
+(1, 1, -75.50, 'expense', 14, 'Compra semanal', '2025-05-18'),
+(1, 1, -22.99, 'expense', 22, 'Suscripción Spotify', '2025-05-05'),
+(1, 1, -110.00, 'expense', 17, 'Consulta médica', '2025-05-14');
+
+-- Deudas del usuario admin
+INSERT INTO debts (user_id, creditor, original_amount, current_balance, interest_rate, installment_amount, start_date, status) VALUES
+(1, 'Préstamo Personal', 10000.00, 7500.00, 0.0550, 250.00, '2024-10-15', 'active');
+
+-- Transacciones recurrentes
+INSERT INTO recurring_transactions (user_id, name, amount, frequency, next_date, category_id, kind) VALUES
+(1, 'Alquiler', 650.00, 'monthly', '2025-06-02', 11, 'expense'),
+(1, 'Netflix', 29.99, 'monthly', '2025-06-05', 21, 'expense'),
+(1, 'Spotify', 22.99, 'monthly', '2025-06-05', 22, 'expense'),
+(1, 'Pago préstamo', 250.00, 'monthly', '2025-06-15', NULL, 'debt_payment');
+
+-- Metas activas para el usuario admin
+INSERT INTO goals (user_id, name, goal_type, target_amount, current_amount, target_date) VALUES
+(1, 'Fondo de emergencia', 'ahorro', 5000.00, 2500.00, '2025-09-30'),
+(1, 'Vacaciones verano', 'viaje', 1200.00, 800.00, '2025-07-15');
+
+-- Retos activos para el usuario admin
+INSERT INTO challenges (user_id, name, description, target_value, current_value, start_date, end_date, status) VALUES
+(1, 'Reducir gastos de ocio', 'Gastar menos de 100€ en ocio este mes', 100.00, 45.00, '2025-05-01', '2025-05-31', 'active'),
+(1, 'Aumentar ahorros', 'Ahorrar 300€ adicionales este mes', 300.00, 150.00, '2025-05-01', '2025-05-31', 'active');

@@ -41,7 +41,7 @@ const Login = () => {
             <div className="login-logo-circle">
               <FaLock />
             </div>
-            <h1 className="login-title">Mi Riqueza</h1>
+            <h1 className="login-title">EconomixAI</h1>
             <p className="login-subtitle">Iniciar Sesión</p>
           </div>
           

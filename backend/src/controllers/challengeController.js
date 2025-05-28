@@ -9,7 +9,7 @@ exports.getChallenges = async (req, res) => {
     
     // Si se solicita filtrar solo los activos
     if (active_only === 'true') {
-      query += ' WHERE active = TRUE';
+      query += " WHERE status = 'active'";
     }
     
     const [challenges] = await pool.query(query);
@@ -29,7 +29,7 @@ exports.getChallenges = async (req, res) => {
 
 // Crear un nuevo reto (solo para administradores)
 exports.createChallenge = async (req, res) => {
-  const { name, description, criteria, reward, start_date, end_date, active } = req.body;
+  const { name, description, target_value, current_value, start_date, end_date, status, user_id } = req.body;
   
   // Verificar si el usuario es administrador
   if (!req.user.is_admin) {
@@ -40,51 +40,41 @@ exports.createChallenge = async (req, res) => {
   }
   
   // Validar campos requeridos
-  if (!name || !description || !criteria) {
+  if (!name || !description || !target_value || !start_date || !end_date) {
     return res.status(400).json({
       success: false,
-      message: 'Faltan campos requeridos: name, description, criteria'
+      message: 'Faltan campos requeridos: name, description, target_value, start_date, end_date'
     });
   }
   
   try {
-    // Verificar si ya existe un reto con este nombre
+    // Verificar si ya existe un reto con este nombre para el mismo usuario
     const [existingChallenge] = await pool.query(
-      'SELECT id FROM challenges WHERE name = ?',
-      [name]
+      'SELECT id FROM challenges WHERE name = ? AND user_id = ?',
+      [name, user_id || req.user.id]
     );
     
     if (existingChallenge.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'Ya existe un reto con este nombre'
-      });
-    }
-    
-    // Asegurarse de que el criterio es un objeto JSON válido
-    let criteriaObj;
-    try {
-      criteriaObj = typeof criteria === 'string' ? JSON.parse(criteria) : criteria;
-    } catch (e) {
-      return res.status(400).json({
-        success: false,
-        message: 'El criterio debe ser un objeto JSON válido'
+        message: 'Ya existe un reto con este nombre para este usuario'
       });
     }
     
     // Crear el reto
     const [result] = await pool.query(
       `INSERT INTO challenges (
-        name, description, criteria, reward, start_date, end_date, active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        user_id, name, description, target_value, current_value, start_date, end_date, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        user_id || req.user.id,
         name,
         description,
-        JSON.stringify(criteriaObj),
-        reward || null,
-        start_date || null,
-        end_date || null,
-        active !== undefined ? active : true
+        target_value,
+        current_value || 0,
+        start_date,
+        end_date,
+        status || 'active'
       ]
     );
     
@@ -141,7 +131,7 @@ exports.getChallengeById = async (req, res) => {
 // Actualizar un reto (solo para administradores)
 exports.updateChallenge = async (req, res) => {
   const { id } = req.params;
-  const { name, description, criteria, reward, start_date, end_date, active } = req.body;
+  const { name, description, target_value, current_value, start_date, end_date, status } = req.body;
   
   // Verificar si el usuario es administrador
   if (!req.user.is_admin) {
@@ -189,45 +179,34 @@ exports.updateChallenge = async (req, res) => {
       queryParams.push(name);
     }
     
-    if (description !== undefined) {
+    if (description) {
       updateFields.push('description = ?');
       queryParams.push(description);
     }
     
-    if (criteria !== undefined) {
-      // Asegurarse de que el criterio es un objeto JSON válido
-      let criteriaObj;
-      try {
-        criteriaObj = typeof criteria === 'string' ? JSON.parse(criteria) : criteria;
-      } catch (e) {
-        return res.status(400).json({
-          success: false,
-          message: 'El criterio debe ser un objeto JSON válido'
-        });
-      }
-      
-      updateFields.push('criteria = ?');
-      queryParams.push(JSON.stringify(criteriaObj));
+    if (target_value !== undefined) {
+      updateFields.push('target_value = ?');
+      queryParams.push(target_value);
     }
     
-    if (reward !== undefined) {
-      updateFields.push('reward = ?');
-      queryParams.push(reward === null ? null : reward);
+    if (current_value !== undefined) {
+      updateFields.push('current_value = ?');
+      queryParams.push(current_value);
     }
     
-    if (start_date !== undefined) {
+    if (start_date) {
       updateFields.push('start_date = ?');
-      queryParams.push(start_date === null ? null : start_date);
+      queryParams.push(start_date);
     }
     
-    if (end_date !== undefined) {
+    if (end_date) {
       updateFields.push('end_date = ?');
-      queryParams.push(end_date === null ? null : end_date);
+      queryParams.push(end_date);
     }
     
-    if (active !== undefined) {
-      updateFields.push('active = ?');
-      queryParams.push(active);
+    if (status) {
+      updateFields.push('status = ?');
+      queryParams.push(status);
     }
     
     // Si no hay nada que actualizar
@@ -313,37 +292,32 @@ exports.deleteChallenge = async (req, res) => {
 // Obtener retos de un usuario específico
 exports.getUserChallenges = async (req, res) => {
   const { userId } = req.params;
-  const requesterId = req.user.id;
-  const { status } = req.query;
+  const { active_only } = req.query;
   
   try {
-    // Verificar permisos - solo el propio usuario puede ver sus retos
-    if (parseInt(userId) !== requesterId && !req.user.is_admin) {
+    // Verificar acceso (solo el propio usuario o administradores)
+    if (req.user.id !== parseInt(userId) && !req.user.is_admin) {
       return res.status(403).json({
         success: false,
-        message: 'No tienes permiso para ver los retos de este usuario'
+        message: 'No tienes permisos para ver los retos de este usuario'
       });
     }
     
-    // Construir consulta
+    // Consultar retos del usuario
     let query = `
-      SELECT uc.*, c.name, c.description, c.criteria, c.reward
-      FROM user_challenges uc
-      JOIN challenges c ON uc.challenge_id = c.id
-      WHERE uc.user_id = ?
+      SELECT * FROM challenges
+      WHERE user_id = ?
     `;
     
-    const queryParams = [userId];
-    
-    // Filtrar por estado si se especifica
-    if (status && ['pending', 'active', 'completed', 'failed'].includes(status)) {
-      query += ' AND uc.status = ?';
-      queryParams.push(status);
+    // Filtrar por estado si se solicita
+    if (active_only === 'true') {
+      query += " AND status = 'active'";
     }
     
-    query += ' ORDER BY uc.start_date DESC';
+    // Ordenar por fecha de inicio descendente
+    query += ' ORDER BY start_date DESC';
     
-    const [userChallenges] = await pool.query(query, queryParams);
+    const [userChallenges] = await pool.query(query, [userId]);
     
     res.json({
       success: true,
@@ -383,7 +357,7 @@ exports.joinChallenge = async (req, res) => {
   try {
     // Verificar que el reto exista y esté activo
     const [challengeCheck] = await pool.query(
-      'SELECT * FROM challenges WHERE id = ? AND active = TRUE',
+      'SELECT * FROM challenges WHERE id = ? AND status = "active"',
       [challenge_id]
     );
     

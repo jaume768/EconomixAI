@@ -91,8 +91,10 @@ exports.createUserGoal = async (req, res) => {
   const { userId } = req.params;
   const requesterId = req.user.id;
   const {
+    name,
     goal_type,
     target_amount,
+    current_amount,
     target_date,
     description
   } = req.body;
@@ -106,10 +108,10 @@ exports.createUserGoal = async (req, res) => {
   }
   
   // Validar campos requeridos
-  if (!goal_type || !target_amount || !target_date) {
+  if (!name || !goal_type || !target_amount || !target_date) {
     return res.status(400).json({
       success: false,
-      message: 'Faltan campos requeridos: goal_type, target_amount, target_date'
+      message: 'Faltan campos requeridos: name, goal_type, target_amount, target_date'
     });
   }
   
@@ -125,12 +127,14 @@ exports.createUserGoal = async (req, res) => {
     // Crear la meta
     const [result] = await pool.query(
       `INSERT INTO goals (
-        user_id, goal_type, target_amount, target_date, description
-      ) VALUES (?, ?, ?, ?, ?)`,
+        user_id, name, goal_type, target_amount, current_amount, target_date, description
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
+        name,
         goal_type,
         target_amount,
+        current_amount || 0,
         target_date,
         description || null
       ]
@@ -164,8 +168,10 @@ exports.updateUserGoal = async (req, res) => {
   const { userId, id } = req.params;
   const requesterId = req.user.id;
   const {
+    name,
     goal_type,
     target_amount,
+    current_amount,
     target_date,
     description
   } = req.body;
@@ -191,11 +197,16 @@ exports.updateUserGoal = async (req, res) => {
         message: 'Meta no encontrada o no pertenece a este usuario'
       });
     }
-    
+
     // Construir consulta de actualización dinámicamente
     let updateFields = [];
     let queryParams = [];
-    
+
+    if (name !== undefined) {
+      updateFields.push('name = ?');
+      queryParams.push(name);
+    }
+
     if (goal_type !== undefined) {
       if (!['ahorro', 'compra', 'viaje', 'jubilacion'].includes(goal_type)) {
         return res.status(400).json({
@@ -206,22 +217,27 @@ exports.updateUserGoal = async (req, res) => {
       updateFields.push('goal_type = ?');
       queryParams.push(goal_type);
     }
-    
+
     if (target_amount !== undefined) {
       updateFields.push('target_amount = ?');
       queryParams.push(target_amount);
     }
-    
+
+    if (current_amount !== undefined) {
+      updateFields.push('current_amount = ?');
+      queryParams.push(current_amount);
+    }
+
     if (target_date !== undefined) {
       updateFields.push('target_date = ?');
       queryParams.push(target_date);
     }
-    
+
     if (description !== undefined) {
       updateFields.push('description = ?');
       queryParams.push(description === null ? null : description);
     }
-    
+
     // Si no hay nada que actualizar
     if (updateFields.length === 0) {
       return res.status(400).json({
