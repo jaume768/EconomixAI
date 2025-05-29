@@ -2,105 +2,140 @@
 .layout-container {
   display: flex;
   min-height: 100vh;
+  background-color: #051923;
+  color: white;
 }
 
+/* Sidebar styles with gradient matching Login page */
 .layout-sidebar {
   width: 240px;
-  background-color: #fff;
-  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-.layout-sidebar-temporary {
+  height: 100vh;
   position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1200;
-  display: none;
-}
-
-.layout-sidebar-permanent {
-  display: none;
+  background: linear-gradient(180deg, #051923 0%, #003554 50%, #006494 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  border-right: 1px solid rgba(0, 166, 251, 0.2);
+  color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .layout-sidebar-title {
-  padding: 16px;
+  padding: 20px 16px;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 64px;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .layout-sidebar-title h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #00A6FB, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .layout-divider {
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: rgba(255, 255, 255, 0.1);
   margin: 0;
+}
+
+.layout-sidebar-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  margin-bottom: 10px;
+}
+
+.layout-sidebar-username {
+  margin-top: 10px;
+  font-weight: 500;
+  font-size: 1rem;
+  color: white;
+  text-align: center;
+}
+
+.layout-theme-toggle {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.layout-theme-toggle:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .layout-menu {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-left: 3em;
 }
 
 .layout-menu-item {
   display: block;
   text-decoration: none;
-  color: inherit;
+  color: white;
+  margin: 8px 0;
 }
 
 .layout-menu-button {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 12px 16px;
   width: 100%;
   border: none;
   background: none;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  margin: 0 8px;
 }
 
 .layout-menu-button:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 166, 251, 0.2);
+  color: white;
 }
 
 .layout-menu-button.selected {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 166, 251, 0.3);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .layout-menu-icon {
   margin-right: 16px;
   display: flex;
   align-items: center;
-  color: rgba(0, 0, 0, 0.54);
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.layout-menu-button.selected .layout-menu-icon {
+  color: #00A6FB;
 }
 
 .layout-menu-text {
   flex-grow: 1;
+  font-weight: 500;
 }
 
-.layout-header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 64px;
-  background-color: #1976d2;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1100;
-}
+
 
 .layout-header-left {
   width: 240px;
@@ -118,16 +153,22 @@
   justify-content: center;
   cursor: pointer;
   margin-right: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.layout-menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .layout-title {
   flex-grow: 1;
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.4rem;
+  font-weight: 600;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .layout-icon-button {
@@ -142,23 +183,30 @@
   justify-content: center;
   cursor: pointer;
   position: relative;
-  margin-left: 8px;
+  margin-left: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.layout-icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .layout-tooltip {
   position: absolute;
-  background-color: rgba(97, 97, 97, 0.9);
+  background-color: rgba(5, 25, 35, 0.9);
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
   font-size: 0.75rem;
-  bottom: -28px;
+  bottom: -32px;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 166, 251, 0.2);
 }
 
 .layout-icon-button:hover .layout-tooltip {
@@ -167,28 +215,40 @@
 }
 
 .layout-avatar {
-  width: 32px;
-  height: 32px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background-color: #9c27b0;
+  background: linear-gradient(135deg, #006494, #00A6FB);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  margin: 0 auto;
 }
 
 .layout-menu-dropdown {
   position: absolute;
-  top: 48px;
+  top: 56px;
   right: 16px;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
-  width: 200px;
+  background-color: rgba(5, 25, 35, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  width: 220px;
   z-index: 1200;
   display: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 166, 251, 0.2);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .layout-menu-dropdown.open {
@@ -198,76 +258,46 @@
 .layout-menu-dropdown-item {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.layout-menu-dropdown-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
 .layout-menu-dropdown-icon {
   margin-right: 16px;
-  color: rgba(0, 0, 0, 0.54);
-}
-
-.layout-menu-dropdown-text {
-  color: rgba(0, 0, 0, 0.87);
 }
 
 .layout-main-content {
   flex-grow: 1;
-  padding: 24px;
-  margin-top: 64px;
-  background-color: #f5f5f5;
-  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #051923 0%, #00304c 100%);
+  min-height: 100vh;
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  padding: 20px;
 }
 
-/* Media Queries */
-@media (max-width: 600px) {
-  .layout-sidebar-temporary {
-    display: block;
-  }
-  
-  .layout-header {
-    left: 0;
-  }
-  
-  .layout-main-content {
-    margin-left: 0;
-  }
+.layout-sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (min-width: 600px) {
-  .layout-sidebar-permanent {
-    display: block;
-  }
-  
-  .layout-header {
-    left: 240px;
-    width: calc(100% - 240px);
-  }
-  
-  .layout-menu-button {
-    display: none;
-  }
-  
-  .layout-main-content {
-    margin-left: 240px;
-    width: calc(100% - 240px);
-  }
+.layout-logout-button {
+  width: 100%;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.layout-logout-button:hover {
+  color: #FF5252;
+  background-color: rgba(255, 82, 82, 0.1);
 }
 
 /* Dark mode */
-.dark-mode .layout-sidebar,
-.dark-mode .layout-menu-dropdown {
-  background-color: #121212;
+.dark-mode .layout-sidebar {
+  background: linear-gradient(180deg, #121212 0%, #1a1a1a 50%, #222222 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-}
-
-.dark-mode .layout-header {
-  background-color: #272727;
 }
 
 .dark-mode .layout-menu-button:hover,

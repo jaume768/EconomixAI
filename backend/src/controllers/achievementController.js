@@ -302,7 +302,7 @@ exports.getUserAchievements = async (req, res) => {
     
     // Obtener los logros obtenidos por el usuario
     const [userAchievements] = await pool.query(
-      `SELECT ua.*, a.name, a.description, a.badge_image
+      `SELECT ua.*, a.name, a.description
        FROM user_achievements ua
        JOIN achievements a ON ua.achievement_id = a.id
        WHERE ua.user_id = ?`,

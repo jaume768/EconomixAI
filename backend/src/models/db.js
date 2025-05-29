@@ -14,7 +14,8 @@ const pool = mysql.createPool({
   port: config.port,
   waitForConnections: config.waitForConnections,
   connectionLimit: config.connectionLimit,
-  queueLimit: config.queueLimit
+  queueLimit: config.queueLimit,
+  charset: 'utf8mb4'
 });
 
 module.exports = pool;

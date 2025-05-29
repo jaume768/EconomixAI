@@ -2,7 +2,13 @@ import axios from 'axios';
 
 // Crear instancia de axios con la URL base
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Accept': 'application/json; charset=utf-8'
+  },
+  responseEncoding: 'utf8',
+  responseType: 'json'
 });
 
 // Interceptor para añadir el token a las peticiones

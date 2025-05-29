@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './css/Dashboard.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
-import { getUserGoals } from '../services/goalService';
-import { getUserChallenges } from '../services/challengeService';
-import { getUserAchievements } from '../services/achievementService';
 import { format, parseISO, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { FaWallet, FaArrowUp, FaArrowDown, FaCreditCard, FaChartLine, FaCalendarAlt, FaHistory, FaRegLightbulb, FaTrophy, FaTasks, FaHome } from 'react-icons/fa';
+import { FaWallet, FaArrowUp, FaArrowDown, FaCreditCard, FaChartLine, FaHistory, FaRegLightbulb } from 'react-icons/fa';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -17,12 +14,6 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [financialSummary, setFinancialSummary] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [goals, setGoals] = useState([]);
-  const [challenges, setChallenges] = useState([]);
-  const [achievements, setAchievements] = useState([]);
-  const [activeGoals, setActiveGoals] = useState([]);
-  const [activeChallenges, setActiveChallenges] = useState([]);
-  const [recentAchievements, setRecentAchievements] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -34,51 +25,18 @@ const Dashboard = () => {
 
         const [
           summaryResponse,
-          transactionsResponse,
-          goalsResponse,
-          challengesResponse,
-          achievementsResponse
+          transactionsResponse
         ] = await Promise.all([
           getTransactionSummary(user.id),
-          getRecentTransactions(user.id, 5),
-          getUserGoals(user.id),
-          getUserChallenges(user.id),
-          getUserAchievements(user.id)
+          getRecentTransactions(user.id, 5)
         ]);
 
         setFinancialSummary(summaryResponse.summary || {});
         setRecentTransactions(transactionsResponse.transactions || []);
-        setGoals(goalsResponse.goals || []);
-        setChallenges(challengesResponse.challenges || []);
-        setAchievements(
-          (achievementsResponse.achievements || []).filter(a => a.achieved)
-        );
-
-        setActiveGoals(
-          (goalsResponse.goals || [])
-            .filter(g => g.current_amount < g.target_amount) // Usa las nuevas propiedades
-            .sort((a, b) => (b.current_amount/b.target_amount) - (a.current_amount/a.target_amount))
-            .slice(0, 3)
-        );
-
-        setActiveChallenges(
-          (challengesResponse.challenges || [])
-            .filter(c => c.status === 'active') // Usa el nuevo campo status
-            .slice(0, 3)
-        );
         
         // Añadimos log para depuración
         console.log('Financial Summary:', summaryResponse.summary);
-        console.log('Goals:', goalsResponse.goals);
-        console.log('Challenges:', challengesResponse.challenges);
-        console.log('Achievements:', achievementsResponse.achievements);
-
-        setRecentAchievements(
-          (achievementsResponse.achievements || [])
-            .filter(a => a.achieved)
-            .sort((a, b) => new Date(b.achieved_at) - new Date(a.achieved_at))
-            .slice(0, 3)
-        );
+        console.log('Recent Transactions:', transactionsResponse.transactions);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         setError('No se pudieron cargar los datos del dashboard. Por favor, intenta de nuevo más tarde.');
@@ -96,81 +54,61 @@ const Dashboard = () => {
 
   const formatDate = (dateString) => {
     try {
-      return format(parseISO(dateString), 'dd MMM yyyy', { locale: es });
+      return format(parseISO(dateString), 'd MMM yyyy', { locale: es });
     } catch (e) {
+      console.error('Error formatting date:', e);
       return dateString;
-    }
-  };
-
-  const calculateProgress = (goal) => {
-    try {
-      if (!goal || !goal.target_amount) return 0;
-      return Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100));
-    } catch (e) {
-      console.error('Error calculando progreso de meta:', e);
-      return 0;
-    }
-  };
-
-  const getChallengeProgress = (challenge) => {
-    try {
-      if (!challenge || !challenge.target_value) return 0;
-      return Math.min(100, Math.round((challenge.current_value / challenge.target_value) * 100));
-    } catch (e) {
-      console.error('Error calculando progreso de desafío:', e);
-      return 0;
     }
   };
 
   const getChartData = () => {
     if (!financialSummary || !financialSummary.categoryBreakdown) {
-      return {
-        pieData: [],
-        barData: { months: [], income: [], expenses: [] }
-      };
+      return { pieData: [], barData: { months: [], income: [], expenses: [] } };
     }
 
-    // Datos para gráfico de categorías
-    const pieData = Object.entries(financialSummary.categoryBreakdown || {})
-      .map(([name, value]) => ({
-        id: name,
-        value: Math.abs(value),
-        label: name
-      }))
-      .filter(item => item.value > 0)
-      .slice(0, 5); // Mostrar top 5 categorías
+    // Datos para el gráfico de barras
+    let barData = { months: [], income: [], expenses: [] };
+    if (financialSummary.monthlyData) {
+      // Obtenemos los últimos 6 meses o menos si no hay suficientes datos
+      const months = Object.keys(financialSummary.monthlyData)
+        .sort((a, b) => new Date(a) - new Date(b))
+        .slice(-6);
 
-    // Datos para gráfico de ingresos/gastos mensuales
-    const months = [];
-    const income = [];
-    const expenses = [];
+      barData.months = months.map(dateStr => {
+        try {
+          return format(parseISO(dateStr), 'MMM yy', { locale: es });
+        } catch (e) {
+          return dateStr;
+        }
+      });
 
-    // Obtener los últimos 6 meses
-    const today = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const date = subMonths(today, i);
-      const monthName = format(date, 'MMM', { locale: es });
-      months.push(monthName);
-
-      // Si hay datos para este mes en el resumen, usarlos
-      const monthKey = format(date, 'yyyy-MM');
-      const monthData = financialSummary.monthlyTotals?.[monthKey] || { income: 0, expenses: 0 };
-
-      income.push(monthData.income || 0);
-      expenses.push(Math.abs(monthData.expenses) || 0); // Convertir a positivo para visualización
+      barData.income = months.map(month => 
+        financialSummary.monthlyData[month]?.income || 0
+      );
+      
+      barData.expenses = months.map(month => 
+        Math.abs(financialSummary.monthlyData[month]?.expenses || 0)
+      );
     }
 
-    return {
-      pieData,
-      barData: { months, income, expenses }
-    };
+    // Datos para el gráfico circular
+    let pieData = [];
+    if (financialSummary.categoryBreakdown) {
+      pieData = Object.entries(financialSummary.categoryBreakdown)
+        .map(([label, value]) => ({ label, value: Math.abs(value) }))
+        .filter(item => item.value > 0)
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 4);
+    }
+
+    return { pieData, barData };
   };
 
   const { pieData, barData } = getChartData();
 
   if (loading) {
     return (
-      <div className="dashboard-container">
+      <div className="dashboard-page">
         <div className="dashboard-loading">
           <div className="dashboard-spinner"></div>
         </div>
@@ -179,44 +117,15 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-container">
-      <nav className="dashboard-nav">
-        <div className="dashboard-logo">
-          <div className="dashboard-logo-circle">
-            <FaWallet />
-          </div>
-          <span>EconomixAI</span>
-        </div>
-        <div className="dashboard-nav-links">
-          <Link to="/" className="dashboard-nav-link active">
-            <FaHome /> <span>Inicio</span>
-          </Link>
-          <Link to="/transactions" className="dashboard-nav-link">
-            <FaHistory /> <span>Transacciones</span>
-          </Link>
-          <Link to="/goals" className="dashboard-nav-link">
-            <FaTasks /> <span>Metas</span>
-          </Link>
-          <Link to="/achievements" className="dashboard-nav-link">
-            <FaTrophy /> <span>Logros</span>
-          </Link>
-        </div>
-      </nav>
-
+    <div className="dashboard-page">
       {error && (
-        <div className="dashboard-error">
-          {error}
-        </div>
+        <div className="dashboard-error">{error}</div>
       )}
 
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">
-          Bienvenido, <span className="dashboard-highlight">{user?.first_name || 'Usuario'}</span>
-        </h1>
-        <p className="dashboard-subtitle">
-          Resumen de tu situación financiera y progresos
-        </p>
-      </div>
+      <header className="dashboard-header">
+        <h1 className="dashboard-title">Bienvenido, <span className="dashboard-highlight">{user?.name || 'Usuario'}</span></h1>
+        <p className="dashboard-subtitle">Aquí tienes un resumen de tu situación financiera</p>
+      </header>
 
       {/* Tarjetas de resumen */}
       <div className="dashboard-grid">
@@ -228,10 +137,10 @@ const Dashboard = () => {
             <p className="dashboard-summary-value">
               {formatCurrency(financialSummary?.totalBalance || 0)}
             </p>
-            <p className="dashboard-summary-footer">
+            <div className="dashboard-summary-footer">
               <FaWallet className="dashboard-summary-icon" />
-              en {financialSummary?.accountCount || 0} cuenta(s)
-            </p>
+              <span>Balance actual</span>
+            </div>
           </div>
         </div>
 
@@ -366,11 +275,10 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Transacciones recientes y widgets de gamificación */}
+      
+      {/* Transacciones recientes */}
       <div className="dashboard-grid">
-        {/* Transacciones recientes */}
-        <div className="dashboard-col-xs-12 dashboard-col-md-6">
+        <div className="dashboard-col-xs-12">
           <div className="dashboard-card dashboard-transactions">
             <div className="dashboard-transactions-header">
               <h2 className="dashboard-transactions-title">
@@ -410,159 +318,6 @@ const Dashboard = () => {
             ) : (
               <div className="dashboard-empty">
                 <p>No hay transacciones recientes</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Widget de Metas */}
-        <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
-          <div className="dashboard-card dashboard-transactions">
-            <div className="dashboard-goals-header">
-              <h2 className="dashboard-goals-title">
-                <FaTasks className="dashboard-chart-icon" /> Metas Activas
-              </h2>
-              <a
-                className="dashboard-transactions-link"
-                onClick={() => navigate('/goals')}
-              >
-                Ver todas <FaArrowDown />
-              </a>
-            </div>
-            <div className="dashboard-divider"></div>
-
-            {activeGoals.length > 0 ? (
-              <ul className="dashboard-goal-list">
-                {activeGoals.map((goal) => (
-                  <li key={goal.id} className="dashboard-goal-item">
-                    <div className="dashboard-goal-name">
-                      <span className="dashboard-goal-icon">
-                        <FaTasks />
-                      </span>
-                      {goal.name}
-                    </div>
-                    <div className="dashboard-goal-info">
-                      <span className="dashboard-goal-dates">
-                        <FaCalendarAlt className="dashboard-goal-icon-small" /> {formatDate(goal.target_date)}
-                      </span>
-                      <span className="dashboard-goal-amount">
-                        {formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)}
-                      </span>
-                    </div>
-                    <div className="dashboard-progress-container">
-                      <div
-                        className="dashboard-progress-bar"
-                        style={{ width: `${calculateProgress(goal)}%` }}
-                      ></div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="dashboard-empty">
-                <p>No tienes metas activas</p>
-                <button
-                  className="dashboard-button"
-                  onClick={() => navigate('/goals/new')}
-                >
-                  <span className="dashboard-button-icon">
-                    <i className="fas fa-plus"></i>
-                  </span>
-                  Crear Meta
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Widget de Retos */}
-        <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
-          <div className="dashboard-card dashboard-transactions">
-            <div className="dashboard-challenges-header">
-              <h2 className="dashboard-challenges-title">
-                <FaTrophy className="dashboard-chart-icon" /> Retos Activos
-              </h2>
-              <a
-                className="dashboard-transactions-link"
-                onClick={() => navigate('/challenges')}
-              >
-                Ver todos <FaArrowDown />
-              </a>
-            </div>
-            <div className="dashboard-divider"></div>
-
-            {activeChallenges.length > 0 ? (
-              <ul className="dashboard-challenge-list">
-                {activeChallenges.map((challenge) => (
-                  <li key={challenge.id} className="dashboard-challenge-item">
-                    <div className="dashboard-challenge-name">
-                      <span className="dashboard-challenge-icon">
-                        <FaTrophy />
-                      </span>
-                      {challenge.name}
-                    </div>
-                    <div className="dashboard-challenge-dates">
-                      <FaCalendarAlt className="dashboard-goal-icon-small" /> {formatDate(challenge.end_date)}
-                    </div>
-                    <div className="dashboard-progress-container">
-                      <div
-                        className="dashboard-progress-bar"
-                        style={{ width: `${getChallengeProgress(challenge)}%` }}
-                      ></div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="dashboard-empty">
-                <p>No estás participando en ningún reto</p>
-                <button
-                  className="dashboard-button"
-                  onClick={() => navigate('/challenges')}
-                >
-                  <span className="dashboard-button-icon">
-                    <i className="fas fa-trophy"></i>
-                  </span>
-                  Explorar Retos
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Widget de Logros Recientes */}
-        <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
-          <div className="dashboard-card dashboard-transactions">
-            <div className="dashboard-goals-header">
-              <h2 className="dashboard-goals-title">
-                Logros Recientes
-              </h2>
-              <a
-                className="dashboard-transactions-link"
-                onClick={() => navigate('/achievements')}
-              >
-                Ver todos <i className="fas fa-arrow-right"></i>
-              </a>
-            </div>
-            <div className="dashboard-divider"></div>
-
-            {recentAchievements.length > 0 ? (
-              <ul className="dashboard-achievement-list">
-                {recentAchievements.map((achievement) => (
-                  <li key={achievement.id} className="dashboard-achievement-item">
-                    <div className="dashboard-achievement-icon">
-                      <i className="fas fa-award"></i>
-                    </div>
-                    <div className="dashboard-achievement-content">
-                      <h4 className="dashboard-achievement-name">{achievement.name}</h4>
-                      <p className="dashboard-achievement-date">Conseguido el {formatDate(achievement.achieved_at)}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="dashboard-empty">
-                <p>Aún no has conseguido ningún logro</p>
               </div>
             )}
           </div>
