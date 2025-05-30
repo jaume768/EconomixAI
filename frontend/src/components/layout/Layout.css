@@ -4,6 +4,8 @@
   min-height: 100vh;
   background-color: #051923;
   color: white;
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* Sidebar styles with gradient matching Login page */
@@ -82,7 +84,6 @@
 .layout-menu {
   list-style: none;
   padding: 0;
-  margin-left: 3em;
 }
 
 .layout-menu-item {
@@ -96,7 +97,6 @@
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  width: 100%;
   border: none;
   background: none;
   text-align: left;
@@ -135,25 +135,8 @@
   font-weight: 500;
 }
 
-
-
 .layout-header-left {
   width: 240px;
-}
-
-.layout-menu-button {
-  background: none;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-right: 16px;
-  transition: background-color 0.3s ease;
 }
 
 .layout-menu-button:hover {
@@ -270,10 +253,65 @@
 .layout-main-content {
   flex-grow: 1;
   background: linear-gradient(135deg, #051923 0%, #00304c 100%);
-  min-height: 100vh;
   margin-left: 240px;
   width: calc(100% - 240px);
+  max-width: 1680px;
   padding: 20px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.layout-mobile-content {
+  margin-left: 0;
+  width: 100%;
+  padding: 16px;
+  padding-bottom: 80px; /* Espacio para la barra de navegación inferior */
+}
+
+.mobile-nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: linear-gradient(180deg, #003554 0%, #006494 100%);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  border-top: 1px solid rgba(0, 166, 251, 0.3);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 0;
+  width: 25%;
+  transition: all 0.2s ease;
+}
+
+.mobile-nav-item.active {
+  color: #00A6FB;
+}
+
+.mobile-nav-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.mobile-nav-text {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .layout-container {
+    flex-direction: column;
+  }
 }
 
 .layout-sidebar-footer {

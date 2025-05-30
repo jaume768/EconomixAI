@@ -10,6 +10,7 @@ import Goals from './pages/Goals';
 import Challenges from './pages/Challenges';
 import Achievements from './pages/Achievements';
 import LandingPage from './pages/LandingPage';
+import Accounts from './pages/Accounts';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -50,15 +51,17 @@ function App() {
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated || justRegistered ? <Register /> : <Navigate to="/dashboard" />} />
         
-        <Route path="/dashboard" element={
+        {/* Rutas principales protegidas que usan el Layout */}
+        <Route element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }>
-          <Route index element={<Dashboard />} />
-          <Route path="goals" element={<Goals />} />
-          <Route path="challenges" element={<Challenges />} />
-          <Route path="achievements" element={<Achievements />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/achievements" element={<Achievements />} />
         </Route>
         
         <Route path="*" element={<div style={{padding: '2rem', textAlign: 'center'}}>

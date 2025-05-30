@@ -3,7 +3,7 @@ const pool = require('../models/db');
 // Listar todas las cuentas del usuario (individuales + familia)
 exports.getAccounts = async (req, res) => {
   const userId = req.user.id;
-  
+
   try {
     // Obtener cuentas personales del usuario
     const [personalAccounts] = await pool.query(
@@ -12,7 +12,7 @@ exports.getAccounts = async (req, res) => {
        WHERE a.user_id = ? AND a.family_id IS NULL`,
       [userId]
     );
-    
+
     // Obtener familias a las que pertenece el usuario
     const [families] = await pool.query(
       `SELECT f.id, f.name
@@ -21,13 +21,13 @@ exports.getAccounts = async (req, res) => {
        WHERE fm.user_id = ?`,
       [userId]
     );
-    
+
     // Obtener cuentas familiares
     let familyAccounts = [];
     if (families.length > 0) {
       const familyIds = families.map(f => f.id);
       const placeholders = familyIds.map(() => '?').join(',');
-      
+
       const [accounts] = await pool.query(
         `SELECT a.*, f.name as family_name, u.username as owner_username, u.first_name as owner_first_name
          FROM accounts a
@@ -36,11 +36,11 @@ exports.getAccounts = async (req, res) => {
          WHERE a.family_id IN (${placeholders})`,
         [...familyIds]
       );
-      
+
       familyAccounts = accounts;
     }
-    
-    // Combinar y devolver todas las cuentas
+
+    // Combinar todas las cuentas
     const allAccounts = [
       ...personalAccounts.map(acc => ({
         ...acc,
@@ -51,10 +51,43 @@ exports.getAccounts = async (req, res) => {
         type: 'family'
       }))
     ];
-    
+
+    // Para cada cuenta, calcular su balance actual basado en transacciones
+    const accountsWithBalance = await Promise.all(allAccounts.map(async (account) => {
+      // Obtener suma de ingresos
+      const [incomeResult] = await pool.query(
+        `SELECT COALESCE(SUM(amount), 0) as total_income
+         FROM transactions
+         WHERE account_id = ? AND type = 'income'`,
+        [account.id]
+      );
+
+      // Obtener suma de gastos
+      const [expenseResult] = await pool.query(
+        `SELECT COALESCE(SUM(amount), 0) as total_expense
+         FROM transactions
+         WHERE account_id = ? AND type = 'expense'`,
+        [account.id]
+      );
+
+      // Calcular balance
+      const totalIncome = parseFloat(incomeResult[0].total_income || 0);
+      const totalExpense = Math.abs(parseFloat(expenseResult[0].total_expense || 0));
+      const balance = totalIncome - totalExpense;
+
+      return {
+        ...account,
+        balance
+      };
+    }));
+
+    // Calcular balance total de todas las cuentas
+    const totalBalance = accountsWithBalance.reduce((sum, account) => sum + account.balance, 0);
+
     res.json({
       success: true,
-      accounts: allAccounts
+      accounts: accountsWithBalance,
+      totalBalance
     });
   } catch (error) {
     console.error('Error al obtener cuentas:', error);
@@ -69,14 +102,14 @@ exports.getAccounts = async (req, res) => {
 exports.createAccount = async (req, res) => {
   const { name, bank_name, account_type, currency = 'EUR', family_id } = req.body;
   const userId = req.user.id;
-  
+
   if (!name || !account_type) {
     return res.status(400).json({
       success: false,
       message: 'El nombre y tipo de cuenta son requeridos'
     });
   }
-  
+
   // Validar que el tipo de cuenta sea válido
   const validTypes = ['ahorro', 'corriente', 'inversión'];
   if (!validTypes.includes(account_type)) {
@@ -85,7 +118,7 @@ exports.createAccount = async (req, res) => {
       message: `El tipo de cuenta debe ser uno de: ${validTypes.join(', ')}`
     });
   }
-  
+
   try {
     // Si es una cuenta familiar, verificar que el usuario pertenezca a la familia
     if (family_id) {
@@ -93,7 +126,7 @@ exports.createAccount = async (req, res) => {
         'SELECT * FROM family_members WHERE family_id = ? AND user_id = ?',
         [family_id, userId]
       );
-      
+
       if (memberCheck.length === 0) {
         return res.status(403).json({
           success: false,
@@ -101,13 +134,13 @@ exports.createAccount = async (req, res) => {
         });
       }
     }
-    
+
     // Crear la cuenta
     const [result] = await pool.query(
       'INSERT INTO accounts (user_id, family_id, name, bank_name, account_type, currency) VALUES (?, ?, ?, ?, ?, ?)',
       [userId, family_id || null, name, bank_name || null, account_type, currency]
     );
-    
+
     // Obtener datos de la familia si es cuenta familiar
     let familyData = null;
     if (family_id) {
@@ -115,7 +148,7 @@ exports.createAccount = async (req, res) => {
         'SELECT name FROM families WHERE id = ?',
         [family_id]
       );
-      
+
       if (families.length > 0) {
         familyData = {
           id: family_id,
@@ -123,7 +156,7 @@ exports.createAccount = async (req, res) => {
         };
       }
     }
-    
+
     res.status(201).json({
       success: true,
       message: 'Cuenta creada con éxito',
@@ -153,7 +186,7 @@ exports.createAccount = async (req, res) => {
 exports.getAccountById = async (req, res) => {
   const { accountId } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Obtener detalles de la cuenta
     const [accounts] = await pool.query(
@@ -163,16 +196,16 @@ exports.getAccountById = async (req, res) => {
        WHERE a.id = ?`,
       [accountId]
     );
-    
+
     if (accounts.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Cuenta no encontrada'
       });
     }
-    
+
     const account = accounts[0];
-    
+
     // Verificar que el usuario sea propietario o miembro de la familia
     if (account.user_id !== userId && account.family_id) {
       // Verificar si el usuario pertenece a la familia
@@ -180,7 +213,7 @@ exports.getAccountById = async (req, res) => {
         'SELECT * FROM family_members WHERE family_id = ? AND user_id = ?',
         [account.family_id, userId]
       );
-      
+
       if (memberCheck.length === 0) {
         return res.status(403).json({
           success: false,
@@ -193,7 +226,7 @@ exports.getAccountById = async (req, res) => {
         message: 'No tienes permiso para ver esta cuenta'
       });
     }
-    
+
     // Obtener el saldo actual
     const [balanceResult] = await pool.query(
       `SELECT COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE -amount END), 0) as balance
@@ -201,9 +234,9 @@ exports.getAccountById = async (req, res) => {
        WHERE account_id = ?`,
       [accountId]
     );
-    
+
     const balance = parseFloat(balanceResult[0].balance) || 0;
-    
+
     // Obtener transacciones recientes
     const [recentTransactions] = await pool.query(
       `SELECT t.id, t.amount, t.type, c.name as category, t.description, t.transaction_date
@@ -214,7 +247,7 @@ exports.getAccountById = async (req, res) => {
        LIMIT 5`,
       [accountId]
     );
-    
+
     res.json({
       success: true,
       account: {
@@ -238,14 +271,14 @@ exports.updateAccount = async (req, res) => {
   const { accountId } = req.params;
   const { name, bank_name, account_type, currency } = req.body;
   const userId = req.user.id;
-  
+
   if (!name && !bank_name && !account_type && !currency) {
     return res.status(400).json({
       success: false,
       message: 'Debe proporcionar al menos un campo para actualizar'
     });
   }
-  
+
   // Validar que el tipo de cuenta sea válido si se proporciona
   if (account_type) {
     const validTypes = ['ahorro', 'corriente', 'inversión'];
@@ -256,7 +289,7 @@ exports.updateAccount = async (req, res) => {
       });
     }
   }
-  
+
   try {
     // Verificar que la cuenta exista y pertenezca al usuario
     const [accounts] = await pool.query(
@@ -266,16 +299,16 @@ exports.updateAccount = async (req, res) => {
        WHERE a.id = ?`,
       [accountId]
     );
-    
+
     if (accounts.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Cuenta no encontrada'
       });
     }
-    
+
     const account = accounts[0];
-    
+
     // Verificar permiso para actualizar
     if (account.user_id !== userId) {
       // Si es cuenta familiar, verificar si el usuario es propietario de la familia
@@ -284,7 +317,7 @@ exports.updateAccount = async (req, res) => {
           'SELECT * FROM family_members WHERE family_id = ? AND user_id = ? AND role = ?',
           [account.family_id, userId, 'owner']
         );
-        
+
         if (ownerCheck.length === 0) {
           return res.status(403).json({
             success: false,
@@ -298,40 +331,40 @@ exports.updateAccount = async (req, res) => {
         });
       }
     }
-    
+
     // Construir la consulta de actualización dinámicamente
     let updateFields = [];
     let queryParams = [];
-    
+
     if (name) {
       updateFields.push('name = ?');
       queryParams.push(name);
     }
-    
+
     if (bank_name !== undefined) {
       updateFields.push('bank_name = ?');
       queryParams.push(bank_name);
     }
-    
+
     if (account_type) {
       updateFields.push('account_type = ?');
       queryParams.push(account_type);
     }
-    
+
     if (currency) {
       updateFields.push('currency = ?');
       queryParams.push(currency);
     }
-    
+
     // Añadir el ID de la cuenta al final de los parámetros
     queryParams.push(accountId);
-    
+
     // Ejecutar la actualización
     await pool.query(
       `UPDATE accounts SET ${updateFields.join(', ')} WHERE id = ?`,
       queryParams
     );
-    
+
     // Obtener la cuenta actualizada
     const [updatedAccounts] = await pool.query(
       `SELECT a.*, f.name as family_name 
@@ -340,7 +373,7 @@ exports.updateAccount = async (req, res) => {
        WHERE a.id = ?`,
       [accountId]
     );
-    
+
     res.json({
       success: true,
       message: 'Cuenta actualizada con éxito',
@@ -362,23 +395,23 @@ exports.updateAccount = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
   const { accountId } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Verificar que la cuenta exista
     const [accounts] = await pool.query(
       'SELECT * FROM accounts WHERE id = ?',
       [accountId]
     );
-    
+
     if (accounts.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Cuenta no encontrada'
       });
     }
-    
+
     const account = accounts[0];
-    
+
     // Verificar permiso para eliminar
     if (account.user_id !== userId) {
       // Si es cuenta familiar, verificar si el usuario es propietario de la familia
@@ -387,7 +420,7 @@ exports.deleteAccount = async (req, res) => {
           'SELECT * FROM family_members WHERE family_id = ? AND user_id = ? AND role = ?',
           [account.family_id, userId, 'owner']
         );
-        
+
         if (ownerCheck.length === 0) {
           return res.status(403).json({
             success: false,
@@ -401,19 +434,19 @@ exports.deleteAccount = async (req, res) => {
         });
       }
     }
-    
+
     // Eliminar transacciones relacionadas
     await pool.query(
       'DELETE FROM transactions WHERE account_id = ?',
       [accountId]
     );
-    
+
     // Eliminar la cuenta
     await pool.query(
       'DELETE FROM accounts WHERE id = ?',
       [accountId]
     );
-    
+
     res.json({
       success: true,
       message: 'Cuenta eliminada con éxito'
@@ -431,13 +464,13 @@ exports.deleteAccount = async (req, res) => {
 exports.getUserAccounts = async (req, res) => {
   const { userId } = req.params;
   const requesterId = req.user.id;
-  
+
   try {
     // Si el usuario solicita sus propias cuentas, mostrar todo
     if (parseInt(userId) === parseInt(requesterId)) {
       return await exports.getAccounts(req, res);
     }
-    
+
     // De lo contrario, verificar si ambos usuarios pertenecen a la misma familia
     const [commonFamilies] = await pool.query(
       `SELECT fm1.family_id
@@ -446,18 +479,18 @@ exports.getUserAccounts = async (req, res) => {
        WHERE fm1.user_id = ? AND fm2.user_id = ?`,
       [requesterId, userId]
     );
-    
+
     if (commonFamilies.length === 0) {
       return res.status(403).json({
         success: false,
         message: 'No tienes permiso para ver las cuentas de este usuario'
       });
     }
-    
+
     // Obtener las cuentas familiares compartidas
     const familyIds = commonFamilies.map(f => f.family_id);
     const placeholders = familyIds.map(() => '?').join(',');
-    
+
     const [accounts] = await pool.query(
       `SELECT a.*, f.name as family_name
        FROM accounts a
@@ -465,7 +498,7 @@ exports.getUserAccounts = async (req, res) => {
        WHERE a.user_id = ? AND a.family_id IN (${placeholders})`,
       [userId, ...familyIds]
     );
-    
+
     res.json({
       success: true,
       accounts: accounts.map(acc => ({

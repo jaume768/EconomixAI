@@ -31,12 +31,6 @@
   --shadow-large: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilos generales */
-body {
-  background-color: var(--color-background);
-  color: var(--color-text);
-}
-
 /* Estilos de tarjetas y contenedores */
 .dashboard-card {
   background-color: var(--color-card-bg);

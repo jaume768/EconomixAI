@@ -8,34 +8,34 @@ exports.getDebts = async (req, res) => {
     sort_by = 'current_balance',
     sort_order = 'DESC'
   } = req.query;
-  
+
   try {
     // Construir consulta base
     let query = `
       SELECT * FROM debts
       WHERE user_id = ?
     `;
-    
+
     const params = [userId];
-    
+
     // Agregar filtro por estado si se proporciona
     if (status && ['active', 'paid_off', 'defaulted'].includes(status)) {
       query += ' AND status = ?';
       params.push(status);
     }
-    
+
     // Validar y agregar ordenamiento
     const validSortFields = ['creditor', 'current_balance', 'interest_rate', 'start_date', 'end_date', 'created_at'];
     const validSortOrders = ['ASC', 'DESC'];
-    
+
     const sortField = validSortFields.includes(sort_by) ? sort_by : 'current_balance';
     const sortOrder = validSortOrders.includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'DESC';
-    
+
     query += ` ORDER BY ${sortField} ${sortOrder}`;
-    
+
     // Ejecutar consulta
     const [debts] = await pool.query(query, params);
-    
+
     // Obtener totales
     const [totals] = await pool.query(
       `SELECT 
@@ -46,7 +46,7 @@ exports.getDebts = async (req, res) => {
        WHERE user_id = ?`,
       [userId]
     );
-    
+
     res.json({
       success: true,
       debts,
@@ -79,7 +79,7 @@ exports.createDebt = async (req, res) => {
     end_date,
     status
   } = req.body;
-  
+
   // Validar campos requeridos
   if (!creditor || !original_amount || !current_balance || interest_rate === undefined || !start_date) {
     return res.status(400).json({
@@ -87,7 +87,7 @@ exports.createDebt = async (req, res) => {
       message: 'Faltan campos requeridos: creditor, original_amount, current_balance, interest_rate, start_date'
     });
   }
-  
+
   try {
     // Crear la deuda
     const [result] = await pool.query(
@@ -109,13 +109,13 @@ exports.createDebt = async (req, res) => {
         status || 'active'
       ]
     );
-    
+
     // Obtener detalles de la deuda creada
     const [newDebt] = await pool.query(
       'SELECT * FROM debts WHERE id = ?',
       [result.insertId]
     );
-    
+
     res.status(201).json({
       success: true,
       message: 'Deuda registrada con éxito',
@@ -134,21 +134,21 @@ exports.createDebt = async (req, res) => {
 exports.getDebtById = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Obtener detalles de la deuda
     const [debts] = await pool.query(
       'SELECT * FROM debts WHERE id = ? AND user_id = ?',
       [id, userId]
     );
-    
+
     if (debts.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Deuda no encontrada o no tienes permiso para verla'
       });
     }
-    
+
     // Obtener pagos recurrentes asociados a esta deuda
     const [payments] = await pool.query(
       `SELECT id, name, amount, frequency, next_date
@@ -156,7 +156,7 @@ exports.getDebtById = async (req, res) => {
        WHERE debt_id = ? AND kind = 'debt_payment'`,
       [id]
     );
-    
+
     res.json({
       success: true,
       debt: debts[0],
@@ -186,65 +186,65 @@ exports.updateDebt = async (req, res) => {
     end_date,
     status
   } = req.body;
-  
+
   try {
     // Verificar que la deuda exista y pertenezca al usuario
     const [debtCheck] = await pool.query(
       'SELECT * FROM debts WHERE id = ? AND user_id = ?',
       [id, userId]
     );
-    
+
     if (debtCheck.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Deuda no encontrada o no tienes permiso para modificarla'
       });
     }
-    
+
     // Construir consulta de actualización dinámicamente
     let updateFields = [];
     let queryParams = [];
-    
+
     if (creditor !== undefined) {
       updateFields.push('creditor = ?');
       queryParams.push(creditor);
     }
-    
+
     if (original_amount !== undefined) {
       updateFields.push('original_amount = ?');
       queryParams.push(original_amount);
     }
-    
+
     if (current_balance !== undefined) {
       updateFields.push('current_balance = ?');
       queryParams.push(current_balance);
     }
-    
+
     if (interest_rate !== undefined) {
       updateFields.push('interest_rate = ?');
       queryParams.push(interest_rate);
     }
-    
+
     if (installment_amount !== undefined) {
       updateFields.push('installment_amount = ?');
       queryParams.push(installment_amount === null ? null : installment_amount);
     }
-    
+
     if (installment_period !== undefined) {
       updateFields.push('installment_period = ?');
       queryParams.push(installment_period);
     }
-    
+
     if (start_date !== undefined) {
       updateFields.push('start_date = ?');
       queryParams.push(start_date);
     }
-    
+
     if (end_date !== undefined) {
       updateFields.push('end_date = ?');
       queryParams.push(end_date === null ? null : end_date);
     }
-    
+
     if (status !== undefined) {
       if (!['active', 'paid_off', 'defaulted'].includes(status)) {
         return res.status(400).json({
@@ -255,7 +255,7 @@ exports.updateDebt = async (req, res) => {
       updateFields.push('status = ?');
       queryParams.push(status);
     }
-    
+
     // Si no hay nada que actualizar
     if (updateFields.length === 0) {
       return res.status(400).json({
@@ -263,20 +263,20 @@ exports.updateDebt = async (req, res) => {
         message: 'No se proporcionaron campos para actualizar'
       });
     }
-    
+
     // Ejecutar la actualización
     queryParams.push(id);
     await pool.query(
       `UPDATE debts SET ${updateFields.join(', ')} WHERE id = ?`,
       queryParams
     );
-    
+
     // Obtener la deuda actualizada
     const [updatedDebt] = await pool.query(
       'SELECT * FROM debts WHERE id = ?',
       [id]
     );
-    
+
     res.json({
       success: true,
       message: 'Deuda actualizada con éxito',
@@ -295,31 +295,31 @@ exports.updateDebt = async (req, res) => {
 exports.deleteDebt = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Verificar que la deuda exista y pertenezca al usuario
     const [debtCheck] = await pool.query(
       'SELECT * FROM debts WHERE id = ? AND user_id = ?',
       [id, userId]
     );
-    
+
     if (debtCheck.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Deuda no encontrada o no tienes permiso para eliminarla'
       });
     }
-    
+
     // Eliminar pagos recurrentes asociados a esta deuda
     await pool.query(
       `DELETE FROM recurring_transactions 
        WHERE debt_id = ? AND kind = 'debt_payment'`,
       [id]
     );
-    
+
     // Eliminar la deuda
     await pool.query('DELETE FROM debts WHERE id = ?', [id]);
-    
+
     res.json({
       success: true,
       message: 'Deuda eliminada con éxito'
@@ -337,7 +337,7 @@ exports.deleteDebt = async (req, res) => {
 exports.getUserDebts = async (req, res) => {
   const { userId } = req.params;
   const requesterId = req.user.id;
-  
+
   try {
     // Verificar permisos - solo el propio usuario puede ver sus deudas
     if (parseInt(userId) !== requesterId) {
@@ -349,7 +349,7 @@ exports.getUserDebts = async (req, res) => {
          WHERE fm1.user_id = ? AND fm2.user_id = ?`,
         [requesterId, userId]
       );
-      
+
       // Solo se permite si son parte de la misma familia
       if (commonFamilies.length === 0) {
         return res.status(403).json({
@@ -358,13 +358,13 @@ exports.getUserDebts = async (req, res) => {
         });
       }
     }
-    
+
     // Obtener deudas del usuario
     const [debts] = await pool.query(
       'SELECT * FROM debts WHERE user_id = ? ORDER BY current_balance DESC',
       [userId]
     );
-    
+
     // Obtener totales
     const [totals] = await pool.query(
       `SELECT 
@@ -375,7 +375,7 @@ exports.getUserDebts = async (req, res) => {
        WHERE user_id = ?`,
       [userId]
     );
-    
+
     res.json({
       success: true,
       debts,

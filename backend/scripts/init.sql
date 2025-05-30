@@ -420,3 +420,48 @@ INSERT INTO goals (user_id, name, goal_type, target_amount, current_amount, targ
 INSERT INTO challenges (user_id, name, description, target_value, current_value, start_date, end_date, status) VALUES
 (1, 'Reducir gastos de ocio', 'Gastar menos de 100€ en ocio este mes', 100.00, 45.00, '2025-05-01', '2025-05-31', 'active'),
 (1, 'Aumentar ahorros', 'Ahorrar 300€ adicionales este mes', 300.00, 150.00, '2025-05-01', '2025-05-31', 'active');
+
+
+-- Cuentas personales para el usuario admin (ID 1)
+INSERT INTO accounts (user_id, family_id, name, bank_name, account_type, currency, created_at) VALUES
+(1, NULL, 'Cuenta Principal', 'BBVA', 'corriente', 'EUR', '2025-01-15 10:00:00'),
+(1, NULL, 'Ahorro Emergencia', 'Santander', 'ahorro', 'EUR', '2025-02-20 14:30:00'),
+(1, NULL, 'Inversión Bolsa', 'XTB', 'inversión', 'EUR', '2025-03-10 09:15:00');
+
+-- Crear una familia para pruebas (si no existe ya)
+INSERT INTO families (name, created_by, created_at) VALUES
+('Familia García', 1, '2025-01-01 00:00:00');
+
+-- Asignar al usuario a la familia (si no está ya asignado)
+INSERT IGNORE INTO family_members (family_id, user_id, role, joined_at) VALUES
+(1, 1, 'owner', '2025-01-01 00:00:00');
+
+-- Cuentas familiares
+INSERT INTO accounts (user_id, family_id, name, bank_name, account_type, currency, created_at) VALUES
+(1, 1, 'Gastos Compartidos', 'CaixaBank', 'corriente', 'EUR', '2025-01-25 11:20:00'),
+(1, 1, 'Ahorro Vacaciones', 'ING', 'ahorro', 'EUR', '2025-02-28 16:45:00');
+
+-- Agregar algunas transacciones a estas cuentas para que tengan balance
+INSERT INTO transactions (user_id, account_id, amount, type, category_id, description, transaction_date) VALUES
+-- Cuenta Principal (ID 1)
+(1, 1, 1500.00, 'income', 1, 'Nómina Mayo', '2025-05-28'),
+(1, 1, -45.50, 'expense', 12, 'Compra supermercado', '2025-05-29'),
+(1, 1, -60.00, 'expense', 14, 'Gasolina', '2025-05-30'),
+
+-- Ahorro Emergencia (ID 2)
+(1, 2, 500.00, 'income', 2, 'Transferencia para ahorro', '2025-05-15'),
+(1, 2, 200.00, 'income', 2, 'Transferencia adicional', '2025-05-25'),
+
+-- Inversión Bolsa (ID 3)
+(1, 3, 1000.00, 'income', 3, 'Depósito inicial', '2025-03-15'),
+(1, 3, -200.00, 'expense', 3, 'Comisiones', '2025-03-16'),
+(1, 3, 150.00, 'income', 3, 'Dividendos', '2025-05-01'),
+
+-- Gastos Compartidos (ID 4)
+(1, 4, 600.00, 'income', 1, 'Aportación mensual', '2025-05-02'),
+(1, 4, -120.00, 'expense', 11, 'Internet y TV', '2025-05-05'),
+(1, 4, -80.00, 'expense', 13, 'Electricidad', '2025-05-10'),
+
+-- Ahorro Vacaciones (ID 5)
+(1, 5, 200.00, 'income', 2, 'Aportación vacaciones', '2025-05-15'),
+(1, 5, 150.00, 'income', 2, 'Aportación adicional', '2025-05-28');

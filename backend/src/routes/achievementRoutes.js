@@ -14,12 +14,12 @@ const achievementValidator = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('El nombre debe tener entre 2 y 100 caracteres'),
-  
+
   body('description')
     .isString()
     .isLength({ min: 10 })
     .withMessage('La descripción debe tener al menos 10 caracteres'),
-  
+
   body('criteria')
     .custom(value => {
       try {

@@ -10,7 +10,7 @@ exports.getRecurringTransactions = async (req, res) => {
     sort_by = 'next_date',
     sort_order = 'ASC'
   } = req.query;
-  
+
   try {
     // Construir consulta base
     let query = `
@@ -20,37 +20,37 @@ exports.getRecurringTransactions = async (req, res) => {
       LEFT JOIN debts d ON rt.debt_id = d.id
       WHERE rt.user_id = ?
     `;
-    
+
     const params = [userId];
-    
+
     // Agregar filtros
     if (kind && ['expense', 'debt_payment'].includes(kind)) {
       query += ' AND rt.kind = ?';
       params.push(kind);
     }
-    
+
     if (category_id) {
       query += ' AND rt.category_id = ?';
       params.push(category_id);
     }
-    
+
     if (frequency && ['daily', 'weekly', 'monthly'].includes(frequency)) {
       query += ' AND rt.frequency = ?';
       params.push(frequency);
     }
-    
+
     // Validar y agregar ordenamiento
     const validSortFields = ['name', 'amount', 'frequency', 'next_date', 'created_at'];
     const validSortOrders = ['ASC', 'DESC'];
-    
+
     const sortField = validSortFields.includes(sort_by) ? sort_by : 'next_date';
     const sortOrder = validSortOrders.includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'ASC';
-    
+
     query += ` ORDER BY rt.${sortField} ${sortOrder}`;
-    
+
     // Ejecutar consulta
     const [transactions] = await pool.query(query, params);
-    
+
     // Calcular totales por tipo y frecuencia
     const [totals] = await pool.query(
       `SELECT 
@@ -62,7 +62,7 @@ exports.getRecurringTransactions = async (req, res) => {
        WHERE user_id = ?`,
       [userId]
     );
-    
+
     res.json({
       success: true,
       recurring_transactions: transactions,
@@ -94,7 +94,7 @@ exports.createRecurringTransaction = async (req, res) => {
     kind,
     debt_id
   } = req.body;
-  
+
   // Validar campos requeridos
   if (!name || !amount || !frequency || !next_date) {
     return res.status(400).json({
@@ -102,7 +102,7 @@ exports.createRecurringTransaction = async (req, res) => {
       message: 'Faltan campos requeridos: name, amount, frequency, next_date'
     });
   }
-  
+
   try {
     // Validar que la frecuencia sea válida
     if (!['daily', 'weekly', 'monthly'].includes(frequency)) {
@@ -111,7 +111,7 @@ exports.createRecurringTransaction = async (req, res) => {
         message: 'La frecuencia debe ser daily, weekly o monthly'
       });
     }
-    
+
     // Validar que el tipo sea válido
     if (kind && !['expense', 'debt_payment'].includes(kind)) {
       return res.status(400).json({
@@ -119,14 +119,14 @@ exports.createRecurringTransaction = async (req, res) => {
         message: 'El tipo debe ser expense o debt_payment'
       });
     }
-    
+
     // Si es un pago de deuda, verificar que la deuda exista y pertenezca al usuario
     if (kind === 'debt_payment' && debt_id) {
       const [debtCheck] = await pool.query(
         'SELECT * FROM debts WHERE id = ? AND user_id = ?',
         [debt_id, userId]
       );
-      
+
       if (debtCheck.length === 0) {
         return res.status(404).json({
           success: false,
@@ -134,14 +134,14 @@ exports.createRecurringTransaction = async (req, res) => {
         });
       }
     }
-    
+
     // Si se proporciona una categoría, verificar que exista
     if (category_id) {
       const [categoryCheck] = await pool.query(
         'SELECT id FROM categories WHERE id = ?',
         [category_id]
       );
-      
+
       if (categoryCheck.length === 0) {
         return res.status(404).json({
           success: false,
@@ -149,7 +149,7 @@ exports.createRecurringTransaction = async (req, res) => {
         });
       }
     }
-    
+
     // Crear la transacción recurrente
     const [result] = await pool.query(
       `INSERT INTO recurring_transactions (
@@ -167,7 +167,7 @@ exports.createRecurringTransaction = async (req, res) => {
         debt_id || null
       ]
     );
-    
+
     // Obtener detalles de la transacción recurrente creada
     const [newTransaction] = await pool.query(
       `SELECT rt.*, c.name as category_name, d.creditor as debt_creditor
@@ -177,7 +177,7 @@ exports.createRecurringTransaction = async (req, res) => {
        WHERE rt.id = ?`,
       [result.insertId]
     );
-    
+
     res.status(201).json({
       success: true,
       message: 'Transacción recurrente creada con éxito',
@@ -196,7 +196,7 @@ exports.createRecurringTransaction = async (req, res) => {
 exports.getRecurringTransactionById = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Obtener detalles de la transacción recurrente
     const [transactions] = await pool.query(
@@ -207,14 +207,14 @@ exports.getRecurringTransactionById = async (req, res) => {
        WHERE rt.id = ? AND rt.user_id = ?`,
       [id, userId]
     );
-    
+
     if (transactions.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Transacción recurrente no encontrada o no tienes permiso para verla'
       });
     }
-    
+
     res.json({
       success: true,
       recurring_transaction: transactions[0]
@@ -241,21 +241,21 @@ exports.updateRecurringTransaction = async (req, res) => {
     kind,
     debt_id
   } = req.body;
-  
+
   try {
     // Verificar que la transacción recurrente exista y pertenezca al usuario
     const [transactionCheck] = await pool.query(
       'SELECT * FROM recurring_transactions WHERE id = ? AND user_id = ?',
       [id, userId]
     );
-    
+
     if (transactionCheck.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Transacción recurrente no encontrada o no tienes permiso para modificarla'
       });
     }
-    
+
     // Validaciones
     if (frequency && !['daily', 'weekly', 'monthly'].includes(frequency)) {
       return res.status(400).json({
@@ -263,21 +263,21 @@ exports.updateRecurringTransaction = async (req, res) => {
         message: 'La frecuencia debe ser daily, weekly o monthly'
       });
     }
-    
+
     if (kind && !['expense', 'debt_payment'].includes(kind)) {
       return res.status(400).json({
         success: false,
         message: 'El tipo debe ser expense o debt_payment'
       });
     }
-    
+
     // Si es un pago de deuda, verificar que la deuda exista y pertenezca al usuario
     if (kind === 'debt_payment' && debt_id) {
       const [debtCheck] = await pool.query(
         'SELECT * FROM debts WHERE id = ? AND user_id = ?',
         [debt_id, userId]
       );
-      
+
       if (debtCheck.length === 0) {
         return res.status(404).json({
           success: false,
@@ -285,14 +285,14 @@ exports.updateRecurringTransaction = async (req, res) => {
         });
       }
     }
-    
+
     // Si se proporciona una categoría, verificar que exista
     if (category_id) {
       const [categoryCheck] = await pool.query(
         'SELECT id FROM categories WHERE id = ?',
         [category_id]
       );
-      
+
       if (categoryCheck.length === 0) {
         return res.status(404).json({
           success: false,
@@ -300,46 +300,46 @@ exports.updateRecurringTransaction = async (req, res) => {
         });
       }
     }
-    
+
     // Construir consulta de actualización dinámicamente
     let updateFields = [];
     let queryParams = [];
-    
+
     if (name !== undefined) {
       updateFields.push('name = ?');
       queryParams.push(name);
     }
-    
+
     if (amount !== undefined) {
       updateFields.push('amount = ?');
       queryParams.push(amount);
     }
-    
+
     if (frequency !== undefined) {
       updateFields.push('frequency = ?');
       queryParams.push(frequency);
     }
-    
+
     if (next_date !== undefined) {
       updateFields.push('next_date = ?');
       queryParams.push(next_date);
     }
-    
+
     if (category_id !== undefined) {
       updateFields.push('category_id = ?');
       queryParams.push(category_id === null ? null : category_id);
     }
-    
+
     if (kind !== undefined) {
       updateFields.push('kind = ?');
       queryParams.push(kind);
     }
-    
+
     if (debt_id !== undefined) {
       updateFields.push('debt_id = ?');
       queryParams.push(debt_id === null ? null : debt_id);
     }
-    
+
     // Si no hay nada que actualizar
     if (updateFields.length === 0) {
       return res.status(400).json({
@@ -347,14 +347,14 @@ exports.updateRecurringTransaction = async (req, res) => {
         message: 'No se proporcionaron campos para actualizar'
       });
     }
-    
+
     // Ejecutar la actualización
     queryParams.push(id);
     await pool.query(
       `UPDATE recurring_transactions SET ${updateFields.join(', ')} WHERE id = ?`,
       queryParams
     );
-    
+
     // Obtener la transacción recurrente actualizada
     const [updatedTransaction] = await pool.query(
       `SELECT rt.*, c.name as category_name, d.creditor as debt_creditor
@@ -364,7 +364,7 @@ exports.updateRecurringTransaction = async (req, res) => {
        WHERE rt.id = ?`,
       [id]
     );
-    
+
     res.json({
       success: true,
       message: 'Transacción recurrente actualizada con éxito',
@@ -383,24 +383,24 @@ exports.updateRecurringTransaction = async (req, res) => {
 exports.deleteRecurringTransaction = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  
+
   try {
     // Verificar que la transacción recurrente exista y pertenezca al usuario
     const [transactionCheck] = await pool.query(
       'SELECT * FROM recurring_transactions WHERE id = ? AND user_id = ?',
       [id, userId]
     );
-    
+
     if (transactionCheck.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Transacción recurrente no encontrada o no tienes permiso para eliminarla'
       });
     }
-    
+
     // Eliminar la transacción recurrente
     await pool.query('DELETE FROM recurring_transactions WHERE id = ?', [id]);
-    
+
     res.json({
       success: true,
       message: 'Transacción recurrente eliminada con éxito'
@@ -418,7 +418,7 @@ exports.deleteRecurringTransaction = async (req, res) => {
 exports.getUserRecurringTransactions = async (req, res) => {
   const { userId } = req.params;
   const requesterId = req.user.id;
-  
+
   try {
     // Verificar permisos - solo el propio usuario puede ver sus transacciones recurrentes
     if (parseInt(userId) !== requesterId) {
@@ -430,7 +430,7 @@ exports.getUserRecurringTransactions = async (req, res) => {
          WHERE fm1.user_id = ? AND fm2.user_id = ?`,
         [requesterId, userId]
       );
-      
+
       // Solo se permite si son parte de la misma familia
       if (commonFamilies.length === 0) {
         return res.status(403).json({
@@ -439,7 +439,7 @@ exports.getUserRecurringTransactions = async (req, res) => {
         });
       }
     }
-    
+
     // Obtener transacciones recurrentes del usuario
     const [transactions] = await pool.query(
       `SELECT rt.*, c.name as category_name, d.creditor as debt_creditor
@@ -450,7 +450,7 @@ exports.getUserRecurringTransactions = async (req, res) => {
        ORDER BY rt.next_date ASC`,
       [userId]
     );
-    
+
     // Calcular totales
     const [totals] = await pool.query(
       `SELECT 
@@ -462,7 +462,7 @@ exports.getUserRecurringTransactions = async (req, res) => {
        WHERE user_id = ?`,
       [userId]
     );
-    
+
     res.json({
       success: true,
       recurring_transactions: transactions,

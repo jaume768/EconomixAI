@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
-const jwt    = require('jsonwebtoken');
-const pool   = require('../models/db');
+const jwt = require('jsonwebtoken');
+const pool = require('../models/db');
 const crypto = require('crypto');
 
 // Importamos TODO el SDK en una sola variable
@@ -291,7 +291,7 @@ exports.register = async (req, res) => {
     // Siempre crear la transacción de saldo inicial, incluso si es 0
     const accountId = accountResult.insertId;
     const initialBalanceValue = parseFloat(initial_balance) || 0;
-    
+
     if (initialBalanceValue > 0) {
       await connection.query(
         'INSERT INTO transactions (user_id, account_id, amount, type, description, transaction_date) VALUES (?, ?, ?, ?, ?, NOW())',
