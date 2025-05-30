@@ -1,0 +1,107 @@
+/* Animaciones adicionales para el Dashboard */
+
+/* Animaciones para tarjetas */
+.dashboard-card {
+  animation-fill-mode: both;
+}
+
+.dashboard-col-xs-12:nth-child(1) .dashboard-card { animation-delay: 0.1s; }
+.dashboard-col-xs-12:nth-child(2) .dashboard-card { animation-delay: 0.2s; }
+.dashboard-col-xs-12:nth-child(3) .dashboard-card { animation-delay: 0.3s; }
+.dashboard-col-xs-12:nth-child(4) .dashboard-card { animation-delay: 0.4s; }
+
+/* Animación para tarjetas de resumen */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dashboard-summary-card {
+  animation: cardEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Animación para las gráficas */
+@keyframes chartGrow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.5);
+    transform-origin: bottom;
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+.dashboard-bar-chart-bar {
+  animation: chartGrow 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.dashboard-bar-chart-column:nth-child(1) .dashboard-bar-chart-bar { animation-delay: 0.1s; }
+.dashboard-bar-chart-column:nth-child(2) .dashboard-bar-chart-bar { animation-delay: 0.2s; }
+.dashboard-bar-chart-column:nth-child(3) .dashboard-bar-chart-bar { animation-delay: 0.3s; }
+.dashboard-bar-chart-column:nth-child(4) .dashboard-bar-chart-bar { animation-delay: 0.4s; }
+.dashboard-bar-chart-column:nth-child(5) .dashboard-bar-chart-bar { animation-delay: 0.5s; }
+.dashboard-bar-chart-column:nth-child(6) .dashboard-bar-chart-bar { animation-delay: 0.6s; }
+
+/* Animación para el gráfico circular */
+@keyframes pieSpin {
+  from {
+    transform: rotate(-90deg) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-90deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.dashboard-pie {
+  animation: pieSpin 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Animación para transacciones recientes */
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.dashboard-transaction-item {
+  animation: slideRight 0.5s ease-out forwards;
+}
+
+.dashboard-transaction-list li:nth-child(1) .dashboard-transaction-item { animation-delay: 0.1s; }
+.dashboard-transaction-list li:nth-child(2) .dashboard-transaction-item { animation-delay: 0.2s; }
+.dashboard-transaction-list li:nth-child(3) .dashboard-transaction-item { animation-delay: 0.3s; }
+.dashboard-transaction-list li:nth-child(4) .dashboard-transaction-item { animation-delay: 0.4s; }
+.dashboard-transaction-list li:nth-child(5) .dashboard-transaction-item { animation-delay: 0.5s; }
+
+/* Mejora de la interacción con tarjetas */
+.dashboard-card:active {
+  transform: scale(0.98) translateY(-2px);
+  transition: all 0.1s ease;
+}
+
+/* Efectos de pulsación para botones */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(0, 166, 251, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 166, 251, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 166, 251, 0); }
+}
+
+.dashboard-transactions-link:active {
+  animation: pulseGlow 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}

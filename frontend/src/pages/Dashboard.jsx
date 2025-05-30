@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/Dashboard.css';
+import './css/dashboard-animations.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
 import { getUserDebts } from '../services/debtService';
