@@ -115,8 +115,12 @@ const Register = () => {
   const validateFinancialData = () => {
     const errors = {};
 
-    if (formData.initial_balance && !/^\d+(\.\d{1,2})?$/.test(formData.initial_balance)) {
-      errors.initial_balance = 'El saldo debe ser un número válido';
+    if (formData.initial_balance) {
+      if (!/^\d+(\.\d{1,2})?$/.test(formData.initial_balance)) {
+        errors.initial_balance = 'El saldo debe ser un número positivo válido';
+      } else if (parseFloat(formData.initial_balance) <= 0) {
+        errors.initial_balance = 'El saldo debe ser mayor que cero';
+      }
     }
 
     return errors;
@@ -613,8 +617,10 @@ const Register = () => {
                     className={`register-input ${formErrors.initial_balance ? 'error' : ''}`}
                     id="initial_balance"
                     name="initial_balance"
-                    type="text"
-                    placeholder="Ej. 1 200 €"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Ej. 1200.00"
                     value={formData.initial_balance}
                     onChange={handleChange}
                     disabled={loading}

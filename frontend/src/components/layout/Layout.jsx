@@ -7,13 +7,14 @@ import './Layout.css';
 
 const menuItems = [
   { text: 'Dashboard', iconClass: 'fas fa-chart-line', path: '/dashboard' },
-  { text: 'Metas', iconClass: 'fas fa-flag', path: '/goals' },
-  { text: 'Retos', iconClass: 'fas fa-trophy', path: '/challenges' },
-  { text: 'Logros', iconClass: 'fas fa-star', path: '/achievements' }
+  { text: 'Cuentas', iconClass: 'fas fa-wallet', path: '/accounts' },
+  { text: 'Transacciones', iconClass: 'fas fa-exchange-alt', path: '/transactions' },
+  { text: 'Simulador', iconClass: 'fas fa-calculator', path: '/simulator' },
+  { text: 'Inversiones', iconClass: 'fas fa-chart-bar', path: '/investments' }
 ];
 
 export default function Layout() {
-  const { mode, toggleTheme } = useTheme();
+  const { mode } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,7 +48,7 @@ export default function Layout() {
   };
   
   return (
-    <div className={`layout-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+    <div className="layout-container">
       <aside className="layout-sidebar">
         <div className="layout-sidebar-title">
           <h2>EconomixAI</h2>
@@ -60,9 +61,6 @@ export default function Layout() {
           <div className="layout-sidebar-username">
             {user?.name || 'Usuario'}
           </div>
-          <button className="layout-theme-toggle" onClick={toggleTheme}>
-            <i className={`fas ${mode === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
-          </button>
         </div>
         <div className="layout-divider"></div>
         <ul className="layout-menu">

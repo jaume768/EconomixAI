@@ -1,34 +1,23 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
-  // Siempre usar tema oscuro por defecto, pero permitir cambio si hay preferencia guardada
-  const storedTheme = localStorage.getItem('theme');
-  const [mode, setMode] = useState(storedTheme || 'dark');
+  // Mantener el tema azul original 
+  const mode = 'blue';
 
+  // Asegurarnos de que no se aplique la clase dark-mode
   useEffect(() => {
-    localStorage.setItem('theme', mode);
-  }, [mode]);
-
-  const toggleTheme = () => {
-    setMode(prevMode => prevMode === 'light' ? 'dark' : 'light');
-  };
-
-  // Apply theme class to body element when theme changes
-  useEffect(() => {
-    if (mode === 'dark') {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-  }, [mode]);
+    // Eliminar la clase dark-mode si existiera
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('theme', 'blue'); // Guardar el tema azul
+  }, []);
 
   const value = {
-    mode,
-    toggleTheme
+    mode
+    // Ya no se proporciona toggleTheme
   };
 
   return (

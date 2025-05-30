@@ -699,7 +699,7 @@ exports.getUserTransactionsSummary = async (req, res) => {
       categoryParams = [category_id];
     }
     
-    // Obtener resumen de ingresos y gastos
+    // Obtener resumen de ingresos y gastos para el período seleccionado
     const [summary] = await pool.query(
       `SELECT 
         SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END) as total_income,
@@ -707,6 +707,15 @@ exports.getUserTransactionsSummary = async (req, res) => {
        FROM transactions t
        WHERE t.user_id = ? ${dateFilter} ${categoryFilter}`,
       [userId, ...dateParams, ...categoryParams]
+    );
+    
+    // Obtener el balance total acumulado (todas las transacciones de todas las fechas)
+    const [totalBalance] = await pool.query(
+      `SELECT 
+        SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE -t.amount END) as balance_total
+       FROM transactions t
+       WHERE t.user_id = ?`,
+      [userId]
     );
     
     // Obtener desglose por categoría
@@ -772,7 +781,8 @@ exports.getUserTransactionsSummary = async (req, res) => {
         month: period === 'month' ? currentMonth : undefined,
         income: parseFloat(summary[0].total_income) || 0,
         expenses: parseFloat(summary[0].total_expenses) || 0,
-        net_balance: netBalance
+        net_balance: netBalance,
+        balance_total: parseFloat(totalBalance[0].balance_total) || 0
       },
       details: {
         income_categories: incomeCategories,

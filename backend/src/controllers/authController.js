@@ -287,12 +287,15 @@ exports.register = async (req, res) => {
       [userId, 'Cuenta Principal', 'corriente', 'EUR']
     );
 
-    // 7. Si hay saldo inicial, registrar como transacción
-    if (parseFloat(initial_balance) > 0) {
-      const accountId = accountResult.insertId;
+    // 7. Registrar saldo inicial como transacción
+    // Siempre crear la transacción de saldo inicial, incluso si es 0
+    const accountId = accountResult.insertId;
+    const initialBalanceValue = parseFloat(initial_balance) || 0;
+    
+    if (initialBalanceValue > 0) {
       await connection.query(
         'INSERT INTO transactions (user_id, account_id, amount, type, description, transaction_date) VALUES (?, ?, ?, ?, ?, NOW())',
-        [userId, accountId, parseFloat(initial_balance), 'income', 'Saldo inicial', new Date()]
+        [userId, accountId, initialBalanceValue, 'income', 'Saldo inicial', new Date()]
       );
     }
 

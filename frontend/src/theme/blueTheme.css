@@ -1,0 +1,83 @@
+/* Blue Theme Override - Forzar tema azul en toda la aplicación */
+:root {
+  /* Colores del tema azul */
+  --color-background: #051923;
+  --color-text: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-primary: #00A6FB;
+  --color-primary-dark: #0582CA;
+  --color-primary-light: #006494;
+  --color-surface: #051923;
+  --color-divider: rgba(0, 166, 251, 0.2);
+  
+  /* Colores para tarjetas */
+  --color-card-bg: rgba(5, 25, 35, 0.7);
+  --color-card-border: rgba(0, 166, 251, 0.2);
+  
+  /* Colores para el sidebar */
+  --color-sidebar-bg-start: #051923;
+  --color-sidebar-bg-middle: #003554;
+  --color-sidebar-bg-end: #006494;
+  
+  /* Colores para elementos del dashboard */
+  --color-success: #4caf50;
+  --color-error: #f44336;
+  --color-warning: #ff9800;
+  --color-info: #2196f3;
+  
+  /* Sombras */
+  --shadow-small: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --shadow-large: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos generales */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+/* Estilos de tarjetas y contenedores */
+.dashboard-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Estilos específicos para el sidebar */
+.layout-sidebar {
+  background: linear-gradient(180deg, var(--color-sidebar-bg-start) 0%, var(--color-sidebar-bg-middle) 50%, var(--color-sidebar-bg-end) 100%);
+  border-right: 1px solid var(--color-card-border);
+}
+
+/* Estilos específicos para el header del dashboard */
+.dashboard-header {
+  background: linear-gradient(135deg, #003554 0%, #006494 100%);
+  border: 1px solid var(--color-card-border);
+}
+
+/* Estilos de los titulares */
+.dashboard-title, .dashboard-subtitle {
+  color: var(--color-text);
+}
+
+.dashboard-highlight {
+  color: var(--color-primary);
+}
+
+/* Estilos para tarjetas de resumen */
+.dashboard-summary-card.dashboard-card-primary {
+  background: linear-gradient(135deg, rgba(0, 82, 130, 0.7) 0%, rgba(0, 100, 148, 0.7) 100%);
+}
+
+.dashboard-summary-card.dashboard-card-success {
+  background: linear-gradient(135deg, rgba(0, 130, 120, 0.7) 0%, rgba(0, 150, 136, 0.7) 100%);
+}
+
+.dashboard-summary-card.dashboard-card-danger {
+  background: linear-gradient(135deg, rgba(130, 30, 30, 0.7) 0%, rgba(198, 40, 40, 0.7) 100%);
+}
+
+.dashboard-summary-card.dashboard-card-warning {
+  background: linear-gradient(135deg, rgba(150, 100, 0, 0.7) 0%, rgba(195, 130, 0, 0.7) 100%);
+}

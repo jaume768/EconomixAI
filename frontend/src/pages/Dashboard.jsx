@@ -135,7 +135,7 @@ const Dashboard = () => {
               Balance Total
             </h2>
             <p className="dashboard-summary-value">
-              {formatCurrency(financialSummary?.totalBalance || 0)}
+              {formatCurrency(financialSummary?.balance_total || 0)}
             </p>
             <div className="dashboard-summary-footer">
               <FaWallet className="dashboard-summary-icon" />
