@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './css/Dashboard.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
+import { getUserDebts } from '../services/debtService';
 import { format, parseISO, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { FaWallet, FaArrowUp, FaArrowDown, FaCreditCard, FaChartLine, FaHistory, FaRegLightbulb } from 'react-icons/fa';
@@ -14,6 +15,9 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [financialSummary, setFinancialSummary] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
+  const [debtSummary, setDebtSummary] = useState(null);
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -25,18 +29,34 @@ const Dashboard = () => {
 
         const [
           summaryResponse,
-          transactionsResponse
+          transactionsResponse,
+          debtResponse,
+          yearSummaryResponse
         ] = await Promise.all([
-          getTransactionSummary(user.id),
-          getRecentTransactions(user.id, 5)
+          getTransactionSummary(user.id, 'month'),
+          getRecentTransactions(user.id, 5),
+          getUserDebts({ status: 'active' }),
+          getTransactionSummary(user.id, 'year')
         ]);
 
         setFinancialSummary(summaryResponse.summary || {});
         setRecentTransactions(transactionsResponse.transactions || []);
+        setDebtSummary(debtResponse.summary || {});
+        
+        // Procesamos datos para gráficos
+        if (yearSummaryResponse.details && yearSummaryResponse.details.by_month) {
+          setMonthlyData(yearSummaryResponse.details.by_month);
+        }
+        
+        if (summaryResponse.details && summaryResponse.details.expense_categories) {
+          setExpenseCategories(summaryResponse.details.expense_categories);
+        }
         
         // Añadimos log para depuración
         console.log('Financial Summary:', summaryResponse.summary);
         console.log('Recent Transactions:', transactionsResponse.transactions);
+        console.log('Debt Summary:', debtResponse.summary);
+        console.log('Year Data:', yearSummaryResponse.details);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         setError('No se pudieron cargar los datos del dashboard. Por favor, intenta de nuevo más tarde.');
@@ -62,40 +82,30 @@ const Dashboard = () => {
   };
 
   const getChartData = () => {
-    if (!financialSummary || !financialSummary.categoryBreakdown) {
-      return { pieData: [], barData: { months: [], income: [], expenses: [] } };
-    }
-
-    // Datos para el gráfico de barras
+    // Datos para el gráfico de barras (últimos 6 meses)
     let barData = { months: [], income: [], expenses: [] };
-    if (financialSummary.monthlyData) {
-      // Obtenemos los últimos 6 meses o menos si no hay suficientes datos
-      const months = Object.keys(financialSummary.monthlyData)
-        .sort((a, b) => new Date(a) - new Date(b))
-        .slice(-6);
+    if (monthlyData && monthlyData.length > 0) {
+      // Aseguramos que tomamos solo los últimos 6 meses
+      const lastSixMonths = [...monthlyData].slice(-6);
 
-      barData.months = months.map(dateStr => {
-        try {
-          return format(parseISO(dateStr), 'MMM yy', { locale: es });
-        } catch (e) {
-          return dateStr;
-        }
+      barData.months = lastSixMonths.map(item => {
+        // Convertir el número de mes a nombre abreviado
+        const date = new Date(2023, item.month - 1, 1);
+        return format(date, 'MMM', { locale: es });
       });
 
-      barData.income = months.map(month => 
-        financialSummary.monthlyData[month]?.income || 0
-      );
-      
-      barData.expenses = months.map(month => 
-        Math.abs(financialSummary.monthlyData[month]?.expenses || 0)
-      );
+      barData.income = lastSixMonths.map(item => item.income || 0);
+      barData.expenses = lastSixMonths.map(item => Math.abs(item.expense) || 0);
     }
 
-    // Datos para el gráfico circular
+    // Datos para el gráfico circular (distribución de gastos por categoría)
     let pieData = [];
-    if (financialSummary.categoryBreakdown) {
-      pieData = Object.entries(financialSummary.categoryBreakdown)
-        .map(([label, value]) => ({ label, value: Math.abs(value) }))
+    if (expenseCategories && expenseCategories.length > 0) {
+      pieData = expenseCategories
+        .map(item => ({ 
+          label: item.category, 
+          value: Math.abs(item.amount) 
+        }))
         .filter(item => item.value > 0)
         .sort((a, b) => b.value - a.value)
         .slice(0, 4);
@@ -150,14 +160,11 @@ const Dashboard = () => {
               Ingresos (Este mes)
             </h2>
             <p className="dashboard-summary-value">
-              {formatCurrency(financialSummary?.currentMonthIncome || 0)}
+              {formatCurrency(financialSummary?.income || 0)}
             </p>
             <div className="dashboard-summary-footer">
               <FaArrowUp className="dashboard-summary-icon" />
-              <span>
-                {financialSummary?.incomeChangePercentage > 0 ? '+' : ''}
-                {financialSummary?.incomeChangePercentage || 0}% vs. mes anterior
-              </span>
+              <span>Este mes</span>
             </div>
           </div>
         </div>
@@ -168,14 +175,11 @@ const Dashboard = () => {
               Gastos (Este mes)
             </h2>
             <p className="dashboard-summary-value">
-              {formatCurrency(Math.abs(financialSummary?.currentMonthExpenses || 0))}
+              {formatCurrency(Math.abs(financialSummary?.expenses || 0))}
             </p>
             <div className="dashboard-summary-footer">
               <FaArrowDown className="dashboard-summary-icon" />
-              <span>
-                {financialSummary?.expenseChangePercentage > 0 ? '+' : ''}
-                {financialSummary?.expenseChangePercentage || 0}% vs. mes anterior
-              </span>
+              <span>Este mes</span>
             </div>
           </div>
         </div>
@@ -186,11 +190,11 @@ const Dashboard = () => {
               Deuda Total
             </h2>
             <p className="dashboard-summary-value">
-              {formatCurrency(financialSummary?.totalDebt || 0)}
+              {formatCurrency(debtSummary?.total_active || 0)}
             </p>
             <p className="dashboard-summary-footer">
               <FaCreditCard className="dashboard-summary-icon" />
-              {financialSummary?.debtCount || 0} deuda(s) activa(s)
+              {debtSummary && debtSummary.total_active > 0 ? 'Deudas activas' : 'Sin deudas'}
             </p>
           </div>
         </div>
@@ -254,7 +258,16 @@ const Dashboard = () => {
               {pieData.length > 0 ? (
                 <div className="dashboard-pie-chart-container">
                   <div className="dashboard-pie-chart">
-                    <div className="dashboard-pie" style={{ background: 'conic-gradient(#00A6FB 0% 25%, #0582CA 25% 55%, #006494 55% 75%, #003554 75% 100%)' }}></div>
+                    <div className="dashboard-pie" style={{ 
+                background: pieData.length > 0 ? 
+                  `conic-gradient(
+                    ${pieData[0] ? '#00A6FB 0% ' + (pieData[0].value / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '%' : ''}, 
+                    ${pieData[1] ? '#0582CA ' + (pieData[0].value / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '% ' + ((pieData[0].value + pieData[1].value) / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '%' : ''}, 
+                    ${pieData[2] ? '#006494 ' + ((pieData[0].value + pieData[1].value) / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '% ' + ((pieData[0].value + pieData[1].value + pieData[2].value) / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '%' : ''}, 
+                    ${pieData[3] ? '#003554 ' + ((pieData[0].value + pieData[1].value + pieData[2].value) / pieData.reduce((sum, item) => sum + item.value, 0) * 100) + '% 100%' : ''}
+                  )` 
+                : 'conic-gradient(#00A6FB 0% 25%, #0582CA 25% 55%, #006494 55% 75%, #003554 75% 100%)'
+              }}></div>
                   </div>
                   <div className="dashboard-pie-legend">
                     {pieData.map((item, index) => (
