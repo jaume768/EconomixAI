@@ -72,11 +72,11 @@ const Accounts = () => {
   const getAccountIcon = (accountType) => {
     switch (accountType) {
       case 'corriente':
-        return <FaUniversity className="account-icon bank" />;
+        return <FaUniversity className="account-icon-account bank" />;
       case 'ahorro':
-        return <FaPiggyBank className="account-icon savings" />;
+        return <FaPiggyBank className="account-icon-account savings" />;
       case 'inversión':
-        return <FaChartLine className="account-icon investment" />;
+        return <FaChartLine className="account-icon-account investment" />;
       default:
         return <FaWallet className="account-icon default" />;
     }

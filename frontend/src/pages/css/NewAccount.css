@@ -1,0 +1,303 @@
+/* NewAccount.css - Estilos para el formulario de nueva cuenta */
+
+.new-account-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 70px);
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  background-color: var(--bg-dark, #0c1e35);
+}
+
+.new-account-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.back-button {
+  background: linear-gradient(135deg, #005685, #0088cc);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 134, 204, 0.3);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 134, 204, 0.4);
+}
+
+.new-account-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.new-account-form {
+  background-color: rgba(17, 38, 70, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: rgba(10, 25, 47, 0.7);
+  border: 1px solid rgba(0, 134, 204, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00A6FB;
+  box-shadow: 0 0 0 2px rgba(0, 166, 251, 0.2);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Estilos para las opciones de tipo de cuenta */
+.account-type-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.account-type-option {
+  flex: 1;
+  min-width: 120px;
+  background-color: rgba(10, 25, 47, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.account-type-option:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 134, 204, 0.5);
+}
+
+.account-type-option.selected {
+  border-color: #00A6FB;
+  box-shadow: 0 0 12px rgba(0, 166, 251, 0.4);
+}
+
+.account-type-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.account-type-label {
+  display: block;
+  font-weight: 500;
+}
+
+/* Colores específicos para cada tipo de cuenta */
+.account-type-option.bank .account-type-icon {
+  color: #0088cc;
+}
+
+.account-type-option.savings .account-type-icon {
+  color: #00cc88;
+}
+
+.account-type-option.investment .account-type-icon {
+  color: #cc8800;
+}
+
+.account-type-option.default .account-type-icon {
+  color: #00A6FB;
+}
+
+/* Estilos para las opciones de moneda */
+.currency-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.currency-option {
+  flex: 1;
+  min-width: 100px;
+  background-color: rgba(10, 25, 47, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.currency-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 134, 204, 0.5);
+}
+
+.currency-option.selected {
+  border-color: #00A6FB;
+  box-shadow: 0 0 12px rgba(0, 166, 251, 0.4);
+}
+
+.currency-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+  color: #00A6FB;
+}
+
+.currency-label {
+  display: block;
+  font-weight: 500;
+}
+
+/* Botones de acción */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #005685, #0088cc);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 134, 204, 0.3);
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 134, 204, 0.4);
+}
+
+.submit-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mensajes de error y éxito */
+.new-account-error {
+  background-color: rgba(204, 51, 51, 0.2);
+  border-left: 4px solid #cc3333;
+  color: #ffcccc;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+}
+
+.new-account-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  background-color: rgba(17, 38, 70, 0.5);
+  border-radius: 12px;
+  margin: 60px auto;
+  max-width: 500px;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #006633, #00cc66);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 204, 102, 0.4);
+}
+
+.new-account-success h2 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.new-account-success p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .account-type-options,
+  .currency-options {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .account-type-option,
+  .currency-option {
+    min-width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+}

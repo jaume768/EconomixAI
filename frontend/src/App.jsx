@@ -11,6 +11,9 @@ import Challenges from './pages/Challenges';
 import Achievements from './pages/Achievements';
 import LandingPage from './pages/LandingPage';
 import Accounts from './pages/Accounts';
+import NewAccount from './pages/NewAccount';
+import AccountDetail from './pages/AccountDetail';
+import Transactions from './pages/Transactions';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -59,9 +62,12 @@ function App() {
         }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/accounts/new" element={<NewAccount />} />
+          <Route path="/accounts/:accountId" element={<AccountDetail />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/achievements" element={<Achievements />} />
+          <Route path="/transactions" element={<Transactions />} />
         </Route>
         
         <Route path="*" element={<div style={{padding: '2rem', textAlign: 'center'}}>

@@ -15,7 +15,9 @@ import {
   FaChartLine,
   FaHistory,
   FaRegLightbulb,
-  FaUserCircle
+  FaUserCircle,
+  FaFilter,
+  FaPlus
 } from 'react-icons/fa';
 
 const Dashboard = () => {
@@ -29,6 +31,8 @@ const Dashboard = () => {
   const [debtSummary, setDebtSummary] = useState({});
   const [monthlyData, setMonthlyData] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState([]);
+  const [transactionPeriod, setTransactionPeriod] = useState('7d');
+  const [animateValues, setAnimateValues] = useState(false);
 
   // Estado y efecto para detectar móvil
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -46,6 +50,9 @@ const Dashboard = () => {
   // Fetch de datos
   useEffect(() => {
     if (!user?.id) return;
+
+    // Iniciar animación cuando se cargan los datos
+    setAnimateValues(false);
 
     const fetchDashboardData = async () => {
       try {
@@ -125,10 +132,9 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="dashboard-page">
-        <div className="dashboard-loading">
-          <div className="dashboard-spinner"></div>
-        </div>
+      <div className="dashboard-header">
+        <h1 className="dashboard-welcome">Bienvenido, {user.name || 'Usuario'}</h1>
+        <p className="dashboard-welcome-sub">Aquí tienes un resumen de tus finanzas personales</p>
       </div>
     );
   }
@@ -245,8 +251,14 @@ const Dashboard = () => {
             <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
               <div className="dashboard-card dashboard-summary-card dashboard-card-primary">
                 <h2 className="dashboard-summary-title">Balance Total</h2>
-                <p className="dashboard-summary-value">
-                  {formatCurrency(financialSummary.balance_total || 0)}
+                <p className="dashboard-summary-value animate-value">
+                  {animateValues ? (
+                    <span className="count-animation">
+                      {formatCurrency(financialSummary.balance_total || 0)}
+                    </span>
+                  ) : (
+                    formatCurrency(financialSummary.balance_total || 0)
+                  )}
                 </p>
                 <div className="dashboard-summary-footer">
                   <FaWallet className="dashboard-summary-icon" />
@@ -257,8 +269,14 @@ const Dashboard = () => {
             <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
               <div className="dashboard-card dashboard-summary-card dashboard-card-success">
                 <h2 className="dashboard-summary-title">Ingresos (Este mes)</h2>
-                <p className="dashboard-summary-value">
-                  {formatCurrency(financialSummary.income || 0)}
+                <p className="dashboard-summary-value animate-value">
+                  {animateValues ? (
+                    <span className="count-animation">
+                      {formatCurrency(financialSummary.income || 0)}
+                    </span>
+                  ) : (
+                    formatCurrency(financialSummary.income || 0)
+                  )}
                 </p>
                 <div className="dashboard-summary-footer">
                   <FaArrowUp className="dashboard-summary-icon" />
@@ -269,8 +287,14 @@ const Dashboard = () => {
             <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
               <div className="dashboard-card dashboard-summary-card dashboard-card-danger">
                 <h2 className="dashboard-summary-title">Gastos (Este mes)</h2>
-                <p className="dashboard-summary-value">
-                  {formatCurrency(Math.abs(financialSummary.expenses || 0))}
+                <p className="dashboard-summary-value animate-value">
+                  {animateValues ? (
+                    <span className="count-animation">
+                      {formatCurrency(Math.abs(financialSummary.expenses || 0))}
+                    </span>
+                  ) : (
+                    formatCurrency(Math.abs(financialSummary.expenses || 0))
+                  )}
                 </p>
                 <div className="dashboard-summary-footer">
                   <FaArrowDown className="dashboard-summary-icon" />
@@ -281,8 +305,14 @@ const Dashboard = () => {
             <div className="dashboard-col-xs-12 dashboard-col-sm-6 dashboard-col-md-3">
               <div className="dashboard-card dashboard-summary-card dashboard-card-warning">
                 <h2 className="dashboard-summary-title">Deuda Total</h2>
-                <p className="dashboard-summary-value">
-                  {formatCurrency(debtSummary.total_active || 0)}
+                <p className="dashboard-summary-value animate-value">
+                  {animateValues ? (
+                    <span className="count-animation">
+                      {formatCurrency(debtSummary.total_active || 0)}
+                    </span>
+                  ) : (
+                    formatCurrency(debtSummary.total_active || 0)
+                  )}
                 </p>
                 <div className="dashboard-summary-footer">
                   <FaCreditCard className="dashboard-summary-icon" />
@@ -295,72 +325,83 @@ const Dashboard = () => {
           {/* Gráficos */}
           <div className="dashboard-grid">
             <div className="dashboard-col-xs-12 dashboard-col-md-7">
-              <div className="dashboard-card dashboard-chart-container">
-                <div className="dashboard-card-header">
-                  <h3 className="dashboard-card-title">
-                    <FaChartLine className="dashboard-card-icon" /> Ingresos y Gastos (Últimos 6 meses)
-                  </h3>
-                </div>
-                <div className="dashboard-chart">
-                  {barData.months.length ? (
-                    <div className="dashboard-chart-content">
-                      <div className="dashboard-chart-legend">
-                        <div className="dashboard-chart-legend-item">
-                          <span className="dashboard-chart-legend-color income"></span>
-                          <span className="dashboard-chart-legend-label">Ingresos</span>
-                        </div>
-                        <div className="dashboard-chart-legend-item">
-                          <span className="dashboard-chart-legend-color expense"></span>
-                          <span className="dashboard-chart-legend-label">Gastos</span>
-                        </div>
+              <div className="dashboard-grid">
+                <div className="dashboard-col-xs-12 dashboard-col-md-12">
+                  <div className="dashboard-card dashboard-transactions">
+                    <div className="dashboard-transactions-header">
+                      <div className="dashboard-transactions-title-container">
+                        <h2 className="dashboard-transactions-title">
+                          <FaHistory className="dashboard-chart-icon" /> Transacciones Recientes
+                        </h2>
                       </div>
-                      <div className="dashboard-bar-chart">
-                        {barData.months.map((m, i) => (
-                          <div key={m} className="dashboard-bar-chart-column">
-                            <div className="dashboard-bar-chart-bars">
+                      <button
+                        className="dashboard-transactions-link"
+                        onClick={() => navigate('/transactions')}
+                      >
+                        Ver todas
+                      </button>
+                    </div>
+                    <div className="dashboard-divider"></div>
+                    {recentTransactions.length ? (
+                      <ul className="dashboard-transaction-list">
+                        {recentTransactions.map(tx => (
+                          <li key={tx.id}>
+                            <div className="dashboard-transaction-item">
                               <div
-                                className="dashboard-bar-chart-bar income"
-                                style={{
-                                  height: `${Math.min(
-                                    100,
-                                    barData.income[i]
-                                      ? (barData.income[i] / Math.max(...barData.income)) * 100
-                                      : 0
-                                  )}%`
-                                }}
-                                title={`Ingresos: ${formatCurrency(barData.income[i] || 0)}`}
-                              />
+                                className={`dashboard-transaction-icon ${tx.amount > 0
+                                  ? 'dashboard-transaction-income'
+                                  : 'dashboard-transaction-expense'
+                                  }`}
+                              >
+                                {tx.amount > 0 ? <FaArrowUp /> : <FaArrowDown />}
+                              </div>
+                              <div className="dashboard-transaction-content">
+                                <p className="dashboard-transaction-description">{tx.description}</p>
+                                <p className="dashboard-transaction-date">{formatDate(tx.date)}</p>
+                              </div>
                               <div
-                                className="dashboard-bar-chart-bar expense"
-                                style={{
-                                  height: `${Math.min(
-                                    100,
-                                    barData.expenses[i]
-                                      ? (barData.expenses[i] / Math.max(...barData.expenses)) * 100
-                                      : 0
-                                  )}%`
-                                }}
-                                title={`Gastos: ${formatCurrency(barData.expenses[i] || 0)}`}
-                              />
+                                className={`dashboard-transaction-amount ${tx.amount > 0
+                                  ? 'dashboard-transaction-income-text'
+                                  : 'dashboard-transaction-expense-text'
+                                  }`}
+                              >
+                                {tx.amount > 0 ? '+' : ''}
+                                {formatCurrency(tx.amount)}
+                              </div>
                             </div>
-                            <div className="dashboard-bar-chart-label">{m}</div>
-                          </div>
+                            <div className="dashboard-divider"></div>
+                          </li>
                         ))}
+                      </ul>
+                    ) : (
+                      <div className="dashboard-empty">
+                        <p>No hay transacciones recientes</p>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="dashboard-chart-empty">
-                      <p>No hay datos suficientes para mostrar</p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
             <div className="dashboard-col-xs-12 dashboard-col-md-5">
+              {/* Tarjeta de tips personalizada */}
+              <div className="dashboard-card dashboard-tips-card">
+                <div className="dashboard-tips-icon">
+                  <FaRegLightbulb />
+                </div>
+                <div className="dashboard-tips-content">
+                  <h3 className="dashboard-tips-title">Recomendación personalizada</h3>
+                  <p className="dashboard-tips-text">Te recomendamos revisar tu categoría de suscripciones: gasto mensual +120 €</p>
+                </div>
+                <button className="dashboard-tips-button" onClick={() => navigate('/recommendations')}>
+                  Ver detalles
+                </button>
+              </div>
+
+              {/* Gráfico de distribución de gastos */}
               <div className="dashboard-card dashboard-chart-container">
                 <div className="dashboard-card-header">
                   <h3 className="dashboard-card-title">
-                    <FaRegLightbulb className="dashboard-card-icon" /> Distribución de Gastos por Categoría
+                    <FaChartLine className="dashboard-card-icon" /> Distribución de Gastos por Categoría
                   </h3>
                 </div>
                 <div className="dashboard-chart">
@@ -416,60 +457,6 @@ const Dashboard = () => {
           </div>
 
           {/* Transacciones recientes escritorio */}
-          <div className="dashboard-grid">
-            <div className="dashboard-col-xs-12">
-              <div className="dashboard-card dashboard-transactions">
-                <div className="dashboard-transactions-header">
-                  <h2 className="dashboard-transactions-title">
-                    <FaHistory className="dashboard-chart-icon" /> Transacciones Recientes
-                  </h2>
-                  <button
-                    className="dashboard-transactions-link"
-                    onClick={() => navigate('/transactions')}
-                  >
-                    Ver todas
-                  </button>
-                </div>
-                <div className="dashboard-divider"></div>
-                {recentTransactions.length ? (
-                  <ul className="dashboard-transaction-list">
-                    {recentTransactions.map(tx => (
-                      <li key={tx.id}>
-                        <div className="dashboard-transaction-item">
-                          <div
-                            className={`dashboard-transaction-icon ${tx.amount > 0
-                                ? 'dashboard-transaction-income'
-                                : 'dashboard-transaction-expense'
-                              }`}
-                          >
-                            {tx.amount > 0 ? <FaArrowUp /> : <FaArrowDown />}
-                          </div>
-                          <div className="dashboard-transaction-content">
-                            <p className="dashboard-transaction-description">{tx.description}</p>
-                            <p className="dashboard-transaction-date">{formatDate(tx.date)}</p>
-                          </div>
-                          <div
-                            className={`dashboard-transaction-amount ${tx.amount > 0
-                                ? 'dashboard-transaction-income-text'
-                                : 'dashboard-transaction-expense-text'
-                              }`}
-                          >
-                            {tx.amount > 0 ? '+' : ''}
-                            {formatCurrency(tx.amount)}
-                          </div>
-                        </div>
-                        <div className="dashboard-divider"></div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="dashboard-empty">
-                    <p>No hay transacciones recientes</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </>
       )}
     </div>

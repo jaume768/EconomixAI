@@ -48,17 +48,27 @@ export const createAccount = async (accountData) => {
  * Actualiza una cuenta existente
  * @param {string} id ID de la cuenta a actualizar
  * @param {Object} accountData Nuevos datos de la cuenta
- * @returns {Promise} Respuesta de la API con la cuenta actualizada
+ * @returns {Promise} Respuesta de la API con la cuenta actualizada y un campo success
  */
 export const updateAccount = async (id, accountData) => {
   try {
     const response = await api.put(`/accounts/${id}`, accountData);
-    return response.data;
+    return {
+      success: true,
+      account: response.data.account || response.data,
+      message: 'Cuenta actualizada correctamente'
+    };
   } catch (error) {
     console.error(`Error al actualizar cuenta con ID ${id}:`, error);
-    throw error;
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Error al actualizar la cuenta',
+      error
+    };
   }
 };
+
+
 
 /**
  * Elimina una cuenta
@@ -95,14 +105,33 @@ export const getAccountsAnalysis = async () => {
  * @param {number} limit Número máximo de transacciones a obtener
  * @returns {Promise} Respuesta de la API con las transacciones recientes
  */
-export const getAccountTransactions = async (accountId, limit = 5) => {
+export const getAccountTransactions = async (accountId, limit = 8) => {
   try {
+    // Primero intentamos con el endpoint específico de la cuenta
     const response = await api.get(`/accounts/${accountId}/transactions`, {
       params: { limit }
     });
-    return response.data;
+    
+    return {
+      success: true,
+      transactions: response.data.transactions || []
+    };
   } catch (error) {
     console.error(`Error al obtener transacciones de la cuenta ${accountId}:`, error);
-    throw error;
+    
+    // Si hay error, podemos intentar con una alternativa
+    try {
+      const fallbackResponse = await api.get(`/transactions?account_id=${accountId}&limit=${limit}`);
+      return {
+        success: true,
+        transactions: fallbackResponse.data.transactions || []
+      };
+    } catch (fallbackError) {
+      return {
+        success: false,
+        message: error.message || 'Error al cargar transacciones',
+        transactions: []
+      };
+    }
   }
 };
