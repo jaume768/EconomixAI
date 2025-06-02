@@ -255,7 +255,6 @@
   background: linear-gradient(135deg, #051923 0%, #00304c 100%);
   margin-left: 240px;
   width: calc(100% - 240px);
-  max-width: 1680px;
   padding: 20px;
   overflow-y: auto;
   transition: all 0.3s ease;

@@ -1,0 +1,998 @@
+/* CSS for the new dashboard visualizations */
+
+/* Net Worth Trend */
+.dashboard-net-worth-card {
+  height: 100%;
+}
+
+.dashboard-trend-indicator {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-trend-indicator.positive {
+  background-color: rgba(25, 135, 84, 0.15);
+  color: var(--color-success);
+}
+
+.dashboard-trend-indicator.negative {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: var(--color-danger);
+}
+
+.dashboard-sparkline-container {
+  width: 100%;
+  height: 80px;
+  margin: 10px 0 20px;
+}
+
+.dashboard-sparkline {
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-net-worth-values {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.dashboard-net-worth-start,
+.dashboard-net-worth-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48%;
+}
+
+.dashboard-net-worth-label {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.dashboard-net-worth-amount {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dashboard-net-worth-date {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Income Expense Comparison */
+.dashboard-income-expense-card {
+  height: 100%;
+}
+
+.dashboard-bar-chart-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 200px;
+  margin: 15px 0;
+  padding-bottom: 30px;
+  position: relative;
+}
+
+.dashboard-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 16%;
+}
+
+.dashboard-bar-pair {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.dashboard-bar-wrapper {
+  width: 48%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.dashboard-bar {
+  width: 100%;
+  transition: height 0.5s ease;
+  position: relative;
+}
+
+.dashboard-bar.income-bar {
+  background-color: var(--color-success);
+  border-radius: 4px 4px 0 0;
+}
+
+.dashboard-bar.expense-bar {
+  background-color: var(--color-danger);
+  border-radius: 4px 4px 0 0;
+}
+
+.dashboard-bar:hover::after {
+  content: attr(data-amount);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.dashboard-bar-label {
+  font-size: 12px;
+  margin-top: 5px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.dashboard-chart-legend {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.dashboard-legend-item {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.dashboard-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.dashboard-legend-color.income {
+  background-color: var(--color-success);
+}
+
+.dashboard-legend-color.expense {
+  background-color: var(--color-danger);
+}
+
+.dashboard-income-expense-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-stat-label {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.dashboard-stat-value {
+  font-weight: 600;
+}
+
+/* Category Distribution */
+.dashboard-category-card {
+  height: 100%;
+}
+
+.dashboard-category-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-donut-chart-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  height: 200px;
+}
+
+.dashboard-donut-chart {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.dashboard-donut-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-donut-total-value {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dashboard-donut-total-label {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.dashboard-category-bars {
+  margin-top: 20px;
+}
+
+.dashboard-category-item {
+  margin-bottom: 15px;
+}
+
+.dashboard-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.dashboard-category-info {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-category-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+
+.dashboard-category-color.color-1 { background-color: #00A6FB; }
+.dashboard-category-color.color-2 { background-color: #0582CA; }
+.dashboard-category-color.color-3 { background-color: #006494; }
+.dashboard-category-color.color-4 { background-color: #003554; }
+.dashboard-category-color.color-5 { background-color: #051923; }
+
+.dashboard-category-name {
+  font-size: 14px;
+}
+
+.dashboard-category-value {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dashboard-budget-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-budget-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.dashboard-budget-overrun {
+  position: absolute;
+  right: 5px;
+  top: -18px;
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+.dashboard-budget-info {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.dashboard-budget-percent {
+  margin-right: 5px;
+  font-weight: 600;
+}
+
+.dashboard-budget-label {
+  color: var(--color-muted);
+}
+
+/* Cash Flow Forecast */
+.dashboard-forecast-card {
+  height: 100%;
+}
+
+.dashboard-period-selector {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-period-icon {
+  margin-right: 5px;
+  color: var(--color-muted);
+}
+
+.dashboard-period-select {
+  background-color: transparent;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dashboard-forecast-container {
+  position: relative;
+  height: 200px;
+  margin: 20px 0;
+}
+
+.dashboard-forecast-line {
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-forecast-labels {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+}
+
+.dashboard-forecast-label {
+  font-size: 10px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.dashboard-forecast-label.projection {
+  color: var(--color-primary);
+}
+
+.dashboard-legend-line.historical {
+  width: 20px;
+  height: 2px;
+  background-color: var(--color-primary);
+  margin-right: 5px;
+}
+
+.dashboard-legend-area.projection {
+  width: 20px;
+  height: 12px;
+  background-color: var(--color-primary);
+  opacity: 0.2;
+  margin-right: 5px;
+}
+
+.dashboard-forecast-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.dashboard-forecast-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48%;
+}
+
+/* Debt Tracker */
+.dashboard-debt-tracker-card {
+  height: 100%;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: none;
+  cursor: default;
+  user-select: text;
+}
+
+.dashboard-debt-summary {
+  margin-bottom: 20px;
+}
+
+.dashboard-debt-total {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 15px 0;
+  color: white;
+}
+
+.dashboard-debt-label {
+  font-size: 14px;
+  color: var(--color-muted);
+  display: block;
+  margin-bottom: 5px;
+}
+
+.dashboard-debt-amount {
+  font-size: 24px;
+  font-weight: 600;
+  display: block;
+}
+
+.dashboard-debt-meter-container {
+  margin: 20px 0;
+}
+
+.dashboard-debt-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.dashboard-debt-meter {
+  height: 10px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.dashboard-debt-meter-zones {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.dashboard-debt-zone {
+  height: 100%;
+}
+
+.dashboard-debt-zone.healthy {
+  width: 40%;
+  background-color: var(--color-success);
+}
+
+.dashboard-debt-zone.warning {
+  width: 30%;
+  background-color: var(--color-warning);
+}
+
+.dashboard-debt-zone.danger {
+  width: 30%;
+  background-color: var(--color-danger);
+}
+
+.dashboard-debt-indicator {
+  position: absolute;
+  top: -5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.dashboard-debt-meter-max {
+  text-align: right;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.dashboard-debt-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.dashboard-debt-status-indicator {
+  font-size: 10px;
+  margin-right: 5px;
+}
+
+.dashboard-debt-status-indicator.healthy {
+  color: var(--color-success);
+}
+
+.dashboard-debt-status-indicator.warning {
+  color: var(--color-warning);
+}
+
+.dashboard-debt-status-indicator.danger {
+  color: var(--color-danger);
+}
+
+.dashboard-debt-list {
+  margin-top: 20px;
+}
+
+.dashboard-debt-list-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.dashboard-debt-item {
+  background-color: rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: none;
+  cursor: default;
+}
+
+.dashboard-debt-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dashboard-debt-name {
+  font-weight: 600;
+}
+
+.dashboard-debt-item-amount {
+  font-weight: 600;
+}
+
+.dashboard-debt-progress-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dashboard-debt-progress-bar {
+  flex-grow: 1;
+  height: 8px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+.dashboard-debt-progress {
+  height: 100%;
+  background-color: var(--color-success);
+}
+
+.dashboard-debt-progress-text {
+  font-size: 12px;
+  color: var(--color-muted);
+  width: 80px;
+  text-align: right;
+}
+
+.dashboard-debt-payment {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.dashboard-debt-payment-label {
+  color: var(--color-muted);
+}
+
+/* KPI Indicators */
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.dashboard-kpi-card {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.dashboard-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.dashboard-kpi-icon.success {
+  background-color: rgba(25, 135, 84, 0.15);
+  color: var(--color-success);
+}
+
+.dashboard-kpi-icon.warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: var(--color-warning);
+}
+
+.dashboard-kpi-icon.danger {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: var(--color-danger);
+}
+
+.dashboard-kpi-content {
+  flex-grow: 1;
+}
+
+.dashboard-kpi-title {
+  font-size: 14px;
+  margin: 0 0 5px;
+  color: var(--color-muted);
+}
+
+.dashboard-kpi-value {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dashboard-kpi-value.success {
+  color: var(--color-success);
+}
+
+.dashboard-kpi-value.warning {
+  color: var(--color-warning);
+}
+
+.dashboard-kpi-value.danger {
+  color: var(--color-danger);
+}
+
+.dashboard-kpi-progress-container {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-kpi-progress-bar {
+  flex-grow: 1;
+  height: 6px;
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+.dashboard-kpi-progress {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.dashboard-kpi-progress.success {
+  background-color: var(--color-success);
+}
+
+.dashboard-kpi-progress.warning {
+  background-color: var(--color-warning);
+}
+
+.dashboard-kpi-progress.danger {
+  background-color: var(--color-danger);
+}
+
+.dashboard-kpi-progress-text {
+  font-size: 12px;
+  color: var(--color-muted);
+  width: 40px;
+  text-align: right;
+}
+
+/* Upcoming Payments */
+.dashboard-upcoming-card {
+  height: 100%;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: none;
+  cursor: default;
+  user-select: text;
+}
+
+.dashboard-upcoming-list {
+  margin-top: 15px;
+}
+
+.dashboard-upcoming-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.07);
+  border-left: 4px solid var(--color-primary);
+}
+
+.dashboard-upcoming-item.urgent {
+  border-left-color: var(--color-danger);
+}
+
+.dashboard-upcoming-item.soon {
+  border-left-color: var(--color-warning);
+}
+
+.dashboard-upcoming-item.normal {
+  border-left-color: var(--color-success);
+}
+
+.dashboard-upcoming-date {
+  margin-right: 15px;
+}
+
+.dashboard-date-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-date-day {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dashboard-date-month {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.dashboard-upcoming-details {
+  flex-grow: 1;
+}
+
+.dashboard-upcoming-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.dashboard-upcoming-countdown {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.dashboard-countdown-icon {
+  font-size: 10px;
+  margin-right: 5px;
+}
+
+.dashboard-upcoming-amount {
+  font-weight: 600;
+}
+
+.dashboard-upcoming-summary {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.dashboard-upcoming-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-upcoming-total-label {
+  color: var(--color-muted);
+}
+
+.dashboard-upcoming-total-amount {
+  font-weight: 600;
+}
+
+/* Savings Goal Progress */
+.dashboard-savings-goals-card {
+  height: 100%;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: none;
+  cursor: default;
+  user-select: text;
+}
+
+.dashboard-goals-list {
+  margin-top: 15px;
+}
+
+.dashboard-goal-item {
+  background-color: rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.dashboard-goal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dashboard-goal-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-goal-trophy {
+  color: gold;
+  margin-right: 5px;
+}
+
+.dashboard-goal-date {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.dashboard-goal-progress-container {
+  margin-bottom: 10px;
+}
+
+.dashboard-goal-progress-bar {
+  height: 8px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+
+.dashboard-goal-progress {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.dashboard-goal-progress.starting {
+  background-color: var(--color-danger);
+}
+
+.dashboard-goal-progress.in-progress {
+  background-color: var(--color-warning);
+}
+
+.dashboard-goal-progress.completed {
+  background-color: var(--color-success);
+}
+
+.dashboard-goal-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.dashboard-goal-current {
+  color: var(--color-muted);
+}
+
+.dashboard-goal-percent {
+  font-weight: 600;
+}
+
+.dashboard-goal-target {
+  color: var(--color-muted);
+}
+
+.dashboard-goal-remaining {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.dashboard-goal-completed-text {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* Common styles */
+.dashboard-empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  color: var(--color-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .dashboard-debt-item,
+.dark-mode .dashboard-upcoming-item,
+.dark-mode .dashboard-goal-item,
+.dark-mode .dashboard-kpi-card {
+  background-color: rgba(255,255,255,0.05);
+}
+
+.dark-mode .dashboard-donut-inner,
+.dark-mode .dashboard-date-container {
+  background-color: var(--dark-card-bg);
+}
+
+.dark-mode .dashboard-budget-bar-container,
+.dark-mode .dashboard-debt-progress-bar,
+.dark-mode .dashboard-kpi-progress-bar,
+.dark-mode .dashboard-goal-progress-bar {
+  background-color: rgba(255,255,255,0.1);
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .dashboard-donut-chart {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .dashboard-donut-inner {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .dashboard-bar-chart-container {
+    height: 150px;
+  }
+  
+  .dashboard-sparkline-container {
+    height: 60px;
+  }
+  
+  .dashboard-goal-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .dashboard-goal-date {
+    margin-top: 5px;
+  }
+  
+  .dashboard-upcoming-item {
+    padding: 10px;
+  }
+  
+  .dashboard-date-container {
+    width: 40px;
+    height: 40px;
+  }
+}

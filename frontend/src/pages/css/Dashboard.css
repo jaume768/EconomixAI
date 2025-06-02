@@ -16,6 +16,10 @@
   margin-bottom: 20px;
 }
 
+.espacio{
+  grid-column: span 12;
+}
+
 .mobile-dashboard-user {
   display: flex;
   align-items: center;
@@ -74,56 +78,49 @@
 
 .mobile-dashboard-tabs {
   display: flex;
-  background: rgba(0, 166, 251, 0.1);
-  border-radius: 52px;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  margin: 10px 0 20px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
   padding: 4px;
+  box-shadow: var(--card-shadow);
 }
 
 .mobile-tab-btn {
-  flex: 1;
-  border: none;
   background: none;
-  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  flex: 1;
   padding: 12px 8px;
-  font-size: 14px;
+  color: var(--text-secondary);
   font-weight: 500;
-  border-radius: 50px;
+  border-radius: 8px;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .mobile-tab-btn.active {
-  background: linear-gradient(135deg, #006494, #00A6FB);
+  background-color: var(--brand-primary);
   color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.mobile-tab-btn:not(.active) {
-  color: #6C7A89;
-  background-color: transparent;
-}
-
-/* Animaciones de entrada para tarjetas */
-.dashboard-card {
-  animation: fadeIn 0.5s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .mobile-balance-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 20px;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--card-shadow);
+  text-align: center;
 }
 
 .mobile-balance-label {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  color: var(--text-secondary);
   margin-bottom: 10px;
-  font-weight: 500;
 }
 
 .mobile-balance-amount {
+  font-size: 2rem;
   font-size: 36px;
   font-weight: 700;
   color: white;
@@ -474,6 +471,7 @@
   background-color: rgba(5, 25, 35, 0.7);
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-md);
+  padding: 25px;
   border: 1px solid rgba(0, 166, 251, 0.2);
   backdrop-filter: blur(10px);
   overflow: hidden;
@@ -1305,7 +1303,6 @@
   display: flex;
   align-items: center;
   padding: 1.25rem;
-  width: 32em;
   margin-bottom: 1.5rem;
   background-color: #f0f9ff;
   border-left: 4px solid #0ea5e9;

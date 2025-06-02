@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/Dashboard.css';
 import './css/dashboard-animations.css';
+import './css/dashboard-visualizations.css';
 import { useAuth } from '../context/AuthContext';
 import { getTransactionSummary, getRecentTransactions } from '../services/transactionService';
 import { getUserDebts } from '../services/debtService';
+import { getChallenges } from '../services/challengeService';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -17,8 +19,20 @@ import {
   FaRegLightbulb,
   FaUserCircle,
   FaFilter,
-  FaPlus
+  FaPlus,
+  FaChartBar,
+  FaChartPie
 } from 'react-icons/fa';
+
+// Importamos los nuevos componentes de visualización
+import NetWorthTrend from '../components/dashboard/NetWorthTrend';
+import IncomeExpenseComparison from '../components/dashboard/IncomeExpenseComparison';
+import CategoryDistribution from '../components/dashboard/CategoryDistribution';
+import CashFlowForecast from '../components/dashboard/CashFlowForecast';
+import DebtTracker from '../components/dashboard/DebtTracker';
+import KeyPerformanceIndicators from '../components/dashboard/KeyPerformanceIndicators';
+import UpcomingPayments from '../components/dashboard/UpcomingPayments';
+import SavingsGoalProgress from '../components/dashboard/SavingsGoalProgress';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -33,6 +47,30 @@ const Dashboard = () => {
   const [expenseCategories, setExpenseCategories] = useState([]);
   const [transactionPeriod, setTransactionPeriod] = useState('7d');
   const [animateValues, setAnimateValues] = useState(false);
+  const [savingsGoals, setSavingsGoals] = useState([]);
+  const [upcomingPayments, setUpcomingPayments] = useState([
+    {
+      id: 1,
+      description: 'Alquiler',
+      amount: 800,
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 3)),
+      status: 'urgent'
+    },
+    {
+      id: 2,
+      description: 'Factura de luz',
+      amount: 75.50,
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 5)),
+      status: 'upcoming'
+    },
+    {
+      id: 3,
+      description: 'Seguro de coche',
+      amount: 220,
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 12)),
+      status: 'normal'
+    }
+  ]);
 
   // Estado y efecto para detectar móvil
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -44,7 +82,7 @@ const Dashboard = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Estado de pestañas en móvil (aún sin contenido condicional)
+  // Estado de pestañas en móvil (con contenido para todas las secciones)
   const [activeSection, setActiveSection] = useState('balance');
 
   // Fetch de datos
@@ -63,12 +101,14 @@ const Dashboard = () => {
           summaryResponse,
           transactionsResponse,
           debtResponse,
-          yearSummaryResponse
+          yearSummaryResponse,
+          challengesResponse
         ] = await Promise.all([
           getTransactionSummary(user.id, 'month'),
           getRecentTransactions(user.id, 5),
           getUserDebts({ status: 'active' }),
-          getTransactionSummary(user.id, 'year')
+          getTransactionSummary(user.id, 'year'),
+          getChallenges()
         ]);
 
         setFinancialSummary(summaryResponse.summary || {});
@@ -79,6 +119,20 @@ const Dashboard = () => {
         }
         if (summaryResponse.details?.expense_categories) {
           setExpenseCategories(summaryResponse.details.expense_categories);
+        }
+        
+        // Adaptamos los challenges como metas de ahorro
+        if (challengesResponse?.challenges) {
+          const goals = challengesResponse.challenges
+            .filter(challenge => challenge.status === 'active')
+            .map(challenge => ({
+              id: challenge.id,
+              name: challenge.name,
+              target: challenge.target_value,
+              current: challenge.current_value,
+              end_date: challenge.end_date
+            }));
+          setSavingsGoals(goals);
         }
       } catch (err) {
         console.error(err);
@@ -158,50 +212,55 @@ const Dashboard = () => {
 
           {/* Pestañas móvil */}
           <div className="mobile-dashboard-tabs">
-            {['balance', 'income', 'expenses', 'debt'].map(section => (
+            {['balance', 'stats', 'goals', 'debt'].map(section => (
               <button
                 key={section}
                 className={`mobile-tab-btn ${activeSection === section ? 'active' : ''}`}
                 onClick={() => setActiveSection(section)}
               >
                 {section === 'balance' ? 'Balance' :
-                  section === 'income' ? 'Ingresos' :
-                    section === 'expenses' ? 'Gastos' : 'Deuda'}
+                  section === 'stats' ? 'Estadísticas' :
+                    section === 'goals' ? 'Metas' : 'Deuda'}
               </button>
             ))}
           </div>
 
           {/* Secciones móviles */}
           {activeSection === 'balance' && (
-            <div className="mobile-balance-section">
-              <h2 className="mobile-balance-label">Balance Total</h2>
-              <div className="mobile-balance-amount">
-                {formatCurrency(financialSummary.balance_total || 0)}
+            <>
+              <div className="mobile-balance-section">
+                <h2 className="mobile-balance-label">Balance Total</h2>
+                <div className="mobile-balance-amount">
+                  {formatCurrency(financialSummary.balance_total || 0)}
+                </div>
               </div>
+              <KeyPerformanceIndicators financialSummary={financialSummary} />
+            </>
+          )}
+          
+          {activeSection === 'stats' && (
+            <div className="mobile-stats-section">
+              <NetWorthTrend monthlyData={monthlyData} />
+              <div className="mobile-section-spacer"></div>
+              <IncomeExpenseComparison monthlyData={monthlyData} />
+              <div className="mobile-section-spacer"></div>
+              <CategoryDistribution expenseCategories={expenseCategories} />
+              <div className="mobile-section-spacer"></div>
+              <CashFlowForecast monthlyData={monthlyData} />
             </div>
           )}
-          {activeSection === 'income' && (
-            <div className="mobile-balance-section">
-              <h2 className="mobile-balance-label">Ingresos (este mes)</h2>
-              <div className="mobile-balance-amount">
-                {formatCurrency(financialSummary.income || 0)}
-              </div>
+          
+          {activeSection === 'goals' && (
+            <div className="mobile-goals-section">
+              <SavingsGoalProgress savingsGoals={savingsGoals} />
+              <div className="mobile-section-spacer"></div>
+              <UpcomingPayments upcomingPayments={upcomingPayments} />
             </div>
           )}
-          {activeSection === 'expenses' && (
-            <div className="mobile-balance-section">
-              <h2 className="mobile-balance-label">Gastos (este mes)</h2>
-              <div className="mobile-balance-amount">
-                {formatCurrency(Math.abs(financialSummary.expenses || 0))}
-              </div>
-            </div>
-          )}
+          
           {activeSection === 'debt' && (
-            <div className="mobile-balance-section">
-              <h2 className="mobile-balance-label">Deuda total</h2>
-              <div className="mobile-balance-amount">
-                {formatCurrency(debtSummary.total_active || 0)}
-              </div>
+            <div className="mobile-debt-section">
+              <DebtTracker debtSummary={debtSummary} />
             </div>
           )}
 
@@ -322,67 +381,99 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Gráficos */}
+          {/* KPIs */}
+          <KeyPerformanceIndicators financialSummary={financialSummary} />
+
+          {/* Fila 1: Net Worth y Income/Expense */}
           <div className="dashboard-grid">
-            <div className="dashboard-col-xs-12 dashboard-col-md-7">
-              <div className="dashboard-grid">
-                <div className="dashboard-col-xs-12 dashboard-col-md-12">
-                  <div className="dashboard-card dashboard-transactions">
-                    <div className="dashboard-transactions-header">
-                      <div className="dashboard-transactions-title-container">
-                        <h2 className="dashboard-transactions-title">
-                          <FaHistory className="dashboard-chart-icon" /> Transacciones Recientes
-                        </h2>
-                      </div>
-                      <button
-                        className="dashboard-transactions-link"
-                        onClick={() => navigate('/transactions')}
-                      >
-                        Ver todas
-                      </button>
-                    </div>
-                    <div className="dashboard-divider"></div>
-                    {recentTransactions.length ? (
-                      <ul className="dashboard-transaction-list">
-                        {recentTransactions.map(tx => (
-                          <li key={tx.id}>
-                            <div className="dashboard-transaction-item">
-                              <div
-                                className={`dashboard-transaction-icon ${tx.amount > 0
-                                  ? 'dashboard-transaction-income'
-                                  : 'dashboard-transaction-expense'
-                                  }`}
-                              >
-                                {tx.amount > 0 ? <FaArrowUp /> : <FaArrowDown />}
-                              </div>
-                              <div className="dashboard-transaction-content">
-                                <p className="dashboard-transaction-description">{tx.description}</p>
-                                <p className="dashboard-transaction-date">{formatDate(tx.date)}</p>
-                              </div>
-                              <div
-                                className={`dashboard-transaction-amount ${tx.amount > 0
-                                  ? 'dashboard-transaction-income-text'
-                                  : 'dashboard-transaction-expense-text'
-                                  }`}
-                              >
-                                {tx.amount > 0 ? '+' : ''}
-                                {formatCurrency(tx.amount)}
-                              </div>
-                            </div>
-                            <div className="dashboard-divider"></div>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="dashboard-empty">
-                        <p>No hay transacciones recientes</p>
-                      </div>
-                    )}
+            <div className="dashboard-col-xs-12 dashboard-col-md-6">
+              <NetWorthTrend monthlyData={monthlyData} />
+            </div>
+            <div className="dashboard-col-xs-12 dashboard-col-md-6">
+              <IncomeExpenseComparison monthlyData={monthlyData} />
+            </div>
+          </div>
+
+          {/* Fila 2: Categorías y Forecast */}
+          <div className="dashboard-grid">
+            <div className="dashboard-col-xs-12 dashboard-col-md-6">
+              <CategoryDistribution expenseCategories={expenseCategories} />
+            </div>
+            <div className="dashboard-col-xs-12 dashboard-col-md-6">
+              <CashFlowForecast monthlyData={monthlyData} />
+            </div>
+          </div>
+
+          {/* Fila 3: Deuda, Pagos y Metas */}
+          <div className="dashboard-grid">
+            <div className="dashboard-col-xs-12 dashboard-col-md-12 dashboard-col-lg-4">
+              <DebtTracker debtSummary={debtSummary} />
+            </div>
+            <div className="dashboard-col-xs-12 dashboard-col-md-6 dashboard-col-lg-4">
+              <UpcomingPayments upcomingPayments={upcomingPayments} />
+            </div>
+            <div className="dashboard-col-xs-12 dashboard-col-md-6 dashboard-col-lg-4">
+              <SavingsGoalProgress savingsGoals={savingsGoals} />
+            </div>
+          </div>
+          
+          {/* Fila 4: Transacciones y Tips */}
+          <div className="dashboard-grid">
+            <div className="dashboard-col-xs-12 dashboard-col-md-8">
+              <div className="dashboard-card dashboard-transactions">
+                <div className="dashboard-transactions-header">
+                  <div className="dashboard-transactions-title-container">
+                    <h2 className="dashboard-transactions-title">
+                      <FaHistory className="dashboard-chart-icon" /> Transacciones Recientes
+                    </h2>
                   </div>
+                  <button
+                    className="dashboard-transactions-link"
+                    onClick={() => navigate('/transactions')}
+                  >
+                    Ver todas
+                  </button>
                 </div>
+                <div className="dashboard-divider"></div>
+                {recentTransactions.length ? (
+                  <ul className="dashboard-transaction-list">
+                    {recentTransactions.map(tx => (
+                      <li key={tx.id}>
+                        <div className="dashboard-transaction-item">
+                          <div
+                            className={`dashboard-transaction-icon ${tx.amount > 0
+                              ? 'dashboard-transaction-income'
+                              : 'dashboard-transaction-expense'
+                              }`}
+                          >
+                            {tx.amount > 0 ? <FaArrowUp /> : <FaArrowDown />}
+                          </div>
+                          <div className="dashboard-transaction-content">
+                            <p className="dashboard-transaction-description">{tx.description}</p>
+                            <p className="dashboard-transaction-date">{formatDate(tx.date)}</p>
+                          </div>
+                          <div
+                            className={`dashboard-transaction-amount ${tx.amount > 0
+                              ? 'dashboard-transaction-income-text'
+                              : 'dashboard-transaction-expense-text'
+                              }`}
+                          >
+                            {tx.amount > 0 ? '+' : ''}
+                            {formatCurrency(tx.amount)}
+                          </div>
+                        </div>
+                        <div className="dashboard-divider"></div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="dashboard-empty">
+                    <p>No hay transacciones recientes</p>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="dashboard-col-xs-12 dashboard-col-md-5">
+            <div className="dashboard-col-xs-12 dashboard-col-md-4">
               {/* Tarjeta de tips personalizada */}
               <div className="dashboard-card dashboard-tips-card">
                 <div className="dashboard-tips-icon">
@@ -396,67 +487,8 @@ const Dashboard = () => {
                   Ver detalles
                 </button>
               </div>
-
-              {/* Gráfico de distribución de gastos */}
-              <div className="dashboard-card dashboard-chart-container">
-                <div className="dashboard-card-header">
-                  <h3 className="dashboard-card-title">
-                    <FaChartLine className="dashboard-card-icon" /> Distribución de Gastos por Categoría
-                  </h3>
-                </div>
-                <div className="dashboard-chart">
-                  {pieData.length ? (
-                    <div className="dashboard-pie-chart-container">
-                      <div className="dashboard-pie-chart">
-                        <div
-                          className="dashboard-pie"
-                          style={{
-                            background: pieData.length
-                              ? `conic-gradient(
-                                  #00A6FB 0% ${(pieData[0].value / pieData.reduce((s, i) => s + i.value, 0)) *
-                              100}%,
-                                  #0582CA ${(pieData[0].value / pieData.reduce((s, i) => s + i.value, 0)) *
-                              100}% ${(pieData[0].value + (pieData[1]?.value || 0)) /
-                              pieData.reduce((s, i) => s + i.value, 0) *
-                              100}%,
-                                  #006494 ${(pieData[0].value + (pieData[1]?.value || 0)) /
-                              pieData.reduce((s, i) => s + i.value, 0) *
-                              100}% ${(pieData[0].value +
-                                (pieData[1]?.value || 0) +
-                                (pieData[2]?.value || 0)) /
-                              pieData.reduce((s, i) => s + i.value, 0) *
-                              100}%,
-                                  #003554 ${(pieData[0].value +
-                                (pieData[1]?.value || 0) +
-                                (pieData[2]?.value || 0)) /
-                              pieData.reduce((s, i) => s + i.value, 0) *
-                              100}% 100%
-                                )`
-                              : undefined
-                          }}
-                        />
-                      </div>
-                      <div className="dashboard-pie-legend">
-                        {pieData.map((c, idx) => (
-                          <div key={idx} className="dashboard-pie-legend-item">
-                            <span className={`dashboard-pie-legend-color color-${idx + 1}`}></span>
-                            <span className="dashboard-pie-legend-label">{c.label}</span>
-                            <span className="dashboard-pie-legend-value">{formatCurrency(c.value)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="dashboard-chart-empty">
-                      <p>No hay datos suficientes para mostrar</p>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
-
-          {/* Transacciones recientes escritorio */}
         </>
       )}
     </div>
