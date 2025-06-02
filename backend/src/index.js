@@ -14,6 +14,7 @@ const recurringTransactionRoutes = require('./routes/recurringTransactionRoutes'
 const goalRoutes = require('./routes/goalRoutes');
 const challengeRoutes = require('./routes/challengeRoutes');
 const achievementRoutes = require('./routes/achievementRoutes');
+const tinkRoutes = require('./routes/tinkRoutes');
 
 // Inicializar Express
 const app = express();
@@ -80,6 +81,7 @@ app.use('/api/recurring-transactions', recurringTransactionRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/achievements', achievementRoutes);
+app.use('/api/tink', tinkRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

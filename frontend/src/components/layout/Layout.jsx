@@ -4,14 +4,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Layout.css';
-import { FaChartLine, FaWallet, FaExchangeAlt, FaCalculator, FaChartBar, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartLine, FaWallet, FaExchangeAlt, FaCalculator, FaChartBar, FaSignOutAlt, FaLink } from 'react-icons/fa';
 
 const menuItems = [
   { text: 'Dashboard', icon: <FaChartLine />, path: '/dashboard' },
   { text: 'Cuentas', icon: <FaWallet />, path: '/accounts' },
   { text: 'Transacciones', icon: <FaExchangeAlt />, path: '/transactions' },
   { text: 'Simulador', icon: <FaCalculator />, path: '/simulator' },
-  { text: 'Inversiones', icon: <FaChartBar />, path: '/investments' }
+  { text: 'Inversiones', icon: <FaChartBar />, path: '/investments' },
+  { text: 'Conectar Banco', icon: <FaLink />, path: '/connect' }
 ];
 
 export default function Layout() {
@@ -136,6 +137,10 @@ export default function Layout() {
           <Link to="/investments" className={`mobile-nav-item ${location.pathname === '/investments' ? 'active' : ''}`}>
             <FaChartBar className="mobile-nav-icon" />
             <span className="mobile-nav-text">Inversiones</span>
+          </Link>
+          <Link to="/connect" className={`mobile-nav-item ${location.pathname === '/connect' ? 'active' : ''}`}>
+            <FaLink className="mobile-nav-icon" />
+            <span className="mobile-nav-text">Conectar</span>
           </Link>
         </nav>
       )}

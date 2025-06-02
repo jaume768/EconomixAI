@@ -1,0 +1,300 @@
+.connect-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.connect-header {
+  margin-bottom: 2rem;
+}
+
+.connect-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connect-icon {
+  color: #0070f3;
+}
+
+.connect-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connect-error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #ef4444;
+}
+
+.connect-success {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #22c55e;
+}
+
+.connect-card {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.connect-card-content {
+  padding: 1.5rem;
+}
+
+.connect-card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.connect-card-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.connect-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.connect-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.connect-feature-icon {
+  font-size: 1.25rem;
+}
+
+.connect-feature-text {
+  font-weight: 500;
+  color: #374151;
+}
+
+.connect-button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.connect-button:hover {
+  background-color: #0051a8;
+}
+
+.connect-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.connect-connections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connect-connection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.connect-connection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.connect-connection-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.connect-connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.connect-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.connect-status-badge.active {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.connect-status-badge.inactive {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.connect-connection-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.connect-connection-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.connect-sync-button,
+.connect-disconnect-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.connect-sync-button {
+  background-color: #0ea5e9;
+  color: white;
+}
+
+.connect-sync-button:hover {
+  background-color: #0284c7;
+}
+
+.connect-sync-button:disabled {
+  background-color: #7dd3fc;
+  cursor: not-allowed;
+}
+
+.connect-disconnect-button {
+  background-color: #ef4444;
+  color: white;
+}
+
+.connect-disconnect-button:hover {
+  background-color: #b91c1c;
+}
+
+.connect-disconnect-button:disabled {
+  background-color: #f87171;
+  cursor: not-allowed;
+}
+
+/* Estilos para modo oscuro */
+.dark-mode .connect-container {
+  color: #e5e7eb;
+}
+
+.dark-mode .connect-title {
+  color: #f3f4f6;
+}
+
+.dark-mode .connect-card {
+  background-color: #1f2937;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .connect-card-title {
+  color: #f3f4f6;
+}
+
+.dark-mode .connect-card-description {
+  color: #d1d5db;
+}
+
+.dark-mode .connect-feature-item {
+  background-color: #374151;
+}
+
+.dark-mode .connect-feature-text {
+  color: #e5e7eb;
+}
+
+.dark-mode .connect-connection-item {
+  background-color: #2d3748;
+  border-color: #4b5563;
+}
+
+.dark-mode .connect-connection-name {
+  color: #f9fafb;
+}
+
+.dark-mode .connect-connection-date {
+  color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .connect-container {
+    padding: 1rem;
+  }
+  
+  .connect-title {
+    font-size: 1.5rem;
+  }
+  
+  .connect-card-title {
+    font-size: 1.25rem;
+  }
+  
+  .connect-features {
+    flex-direction: column;
+  }
+  
+  .connect-connection-item {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .connect-connection-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .connect-sync-button,
+  .connect-disconnect-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

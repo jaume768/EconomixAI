@@ -1300,15 +1300,12 @@
   color: #90caf9;
 }
 
-.dashboard-col-md-12{
-  grid-column: span 12;
-}
-
 /* Tarjeta de tips personalizada */
 .dashboard-tips-card {
   display: flex;
   align-items: center;
   padding: 1.25rem;
+  width: 32em;
   margin-bottom: 1.5rem;
   background-color: #f0f9ff;
   border-left: 4px solid #0ea5e9;

@@ -342,6 +342,23 @@ CREATE TABLE `user_2fa` (
   UNIQUE KEY `ux_2fa_user` (`user_id`),
   CONSTRAINT `fk_2fa_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `tink_connections` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `tink_user_id` VARCHAR(255) NOT NULL,
+  `tink_credentials_id` VARCHAR(255) NOT NULL,
+  `status` VARCHAR(50) NOT NULL,
+  `bank_name` VARCHAR(255),
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  UNIQUE KEY `ux_tink_connection` (`user_id`, `tink_credentials_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 -- Datos iniciales para tablas de referencia
 INSERT INTO roles (name) VALUES ('normal'), ('premium');
 

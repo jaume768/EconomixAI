@@ -14,6 +14,7 @@ import Accounts from './pages/Accounts';
 import NewAccount from './pages/NewAccount';
 import AccountDetail from './pages/AccountDetail';
 import Transactions from './pages/Transactions';
+import ConnectBank from './pages/ConnectBank';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -68,6 +69,7 @@ function App() {
           <Route path="/challenges" element={<Challenges />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/connect" element={<ConnectBank />} />
         </Route>
         
         <Route path="*" element={<div style={{padding: '2rem', textAlign: 'center'}}>
