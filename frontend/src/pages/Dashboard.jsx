@@ -14,14 +14,9 @@ import {
   FaArrowUp,
   FaArrowDown,
   FaCreditCard,
-  FaChartLine,
   FaHistory,
   FaRegLightbulb,
-  FaUserCircle,
-  FaFilter,
-  FaPlus,
-  FaChartBar,
-  FaChartPie
+  FaUserCircle
 } from 'react-icons/fa';
 
 // Importamos los nuevos componentes de visualización
